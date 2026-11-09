@@ -1,0 +1,35 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer utilities {
+    .glass-panel {
+        @apply relative bg-slate-900/40 backdrop-blur-xl border border-emerald-500/20 shadow-[0_8px_32px_0_rgba(0,0,0,0.45)] hover:border-emerald-400/50 transition-all duration-300 before:absolute before:inset-x-0 before:top-0 before:h-px before:bg-gradient-to-r before:from-transparent before:via-emerald-400/60 before:to-transparent;
+    }
+}
+
+/* Custom Dark Scrollbar */
+::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+::-webkit-scrollbar-track {
+    background: #060B0E;
+}
+::-webkit-scrollbar-thumb {
+    background: rgba(16, 185, 129, 0.3);
+    border-radius: 9999px;
+}
+::-webkit-scrollbar-thumb:hover {
+    background: rgba(16, 185, 129, 0.6);
+}
+
+/* Custom Leaflet Popup Glassmorphism */
+.leaflet-popup-content-wrapper,
+.leaflet-popup-tip {
+    background: rgba(15, 23, 42, 0.92) !important;
+    backdrop-filter: blur(16px);
+    color: #f1f5f9 !important;
+    border: 1px solid rgba(16, 185, 129, 0.35);
+    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.6) !important;
+}
