@@ -7,6 +7,8 @@ use App\Models\WasteFact;
 use App\Models\WasteScan;
 use App\Services\WasteVisionService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 use Inertia\Inertia;
 
 class TaniArangController extends Controller
@@ -15,7 +17,6 @@ class TaniArangController extends Controller
     {
         $scans = WasteScan::latest()->get();
 
-        // Regional chart data (East Java & West Sulawesi clusters)
         $regionalComparison = [
             ['region' => 'Lamongan (Jatim)', 'timbulan_ribu_ton' => 840, 'biochar_terolah_ribu_ton' => 310, 'cluster' => 'Jawa Timur'],
             ['region' => 'Ngawi (Jatim)', 'timbulan_ribu_ton' => 790, 'biochar_terolah_ribu_ton' => 295, 'cluster' => 'Jawa Timur'],
@@ -24,7 +25,6 @@ class TaniArangController extends Controller
             ['region' => 'Polman (Sulbar)', 'timbulan_ribu_ton' => 310, 'biochar_terolah_ribu_ton' => 178, 'cluster' => 'Sulawesi Barat'],
         ];
 
-        // Waste distribution from recorded scans
         $distribution = [
             ['name' => 'Jerami Padi', 'value' => max(1, $scans->where('detected_waste_type', 'Jerami Padi (Oryza sativa)')->count()), 'color' => '#10B981'],
             ['name' => 'Kulit Kakao', 'value' => max(1, $scans->where('detected_waste_type', 'Kulit Buah Kakao (Theobroma cacao Pod Husk)')->count()), 'color' => '#F59E0B'],
@@ -32,7 +32,6 @@ class TaniArangController extends Controller
             ['name' => 'Sekam Padi', 'value' => max(1, $scans->where('detected_waste_type', 'Sekam Padi (Rice Husk)')->count()), 'color' => '#34D399'],
         ];
 
-        // Monthly open-burning reduction trend
         $monthlyTrend = [
             ['bulan' => 'Jun', 'pembakaran_terbuka_ha' => 420, 'konversi_biochar_ha' => 95],
             ['bulan' => 'Jul', 'pembakaran_terbuka_ha' => 365, 'konversi_biochar_ha' => 160],
@@ -90,27 +89,77 @@ class TaniArangController extends Controller
             'farmer_group_name' => 'required|string|max:140',
             'village_location' => 'required|string|max:160',
             'regency' => 'required|string|max:80',
-            'latitude' => 'required|numeric',
-            'longitude' => 'required|numeric',
-            'detected_waste_type' => 'required|string',
-            'moisture_condition' => 'required|string',
-            'ai_confidence' => 'required|numeric',
+            'latitude' => 'required|numeric|between:-90,90',
+            'longitude' => 'required|numeric|between:-180,180',
+            'image_base64' => 'nullable|string',
+            'detected_waste_type' => 'required|string|max:160',
+            'moisture_condition' => 'required|string|max:120',
+            'ai_confidence' => 'required|numeric|min:0|max:100',
             'ai_summary_recommendation' => 'required|string',
-            'ai_next_steps' => 'required|array',
+            'ai_next_steps' => 'required|array|min:1',
+            'processing_status' => 'nullable|in:Belum diolah,Diproses,Selesai',
         ]);
 
-        $validated['image_path'] = '/demo/community-verified.webp';
+        $imagePath = '/demo/community-verified.webp';
+
+        if (!empty($validated['image_base64']) && preg_match('/^data:image\/(\w+);base64,/', $validated['image_base64'], $matches)) {
+            $extension = strtolower($matches[1]) === 'jpeg' ? 'jpg' : strtolower($matches[1]);
+            $rawData = substr($validated['image_base64'], strpos($validated['image_base64'], ',') + 1);
+            $decoded = base64_decode($rawData, true);
+
+            if ($decoded !== false) {
+                $filename = 'scans/' . now()->format('Ymd_His') . '_' . Str::random(8) . '.' . $extension;
+                Storage::disk('public')->put($filename, $decoded);
+                $imagePath = '/storage/' . $filename;
+            }
+        }
+
+        unset($validated['image_base64']);
+        $validated['image_path'] = $imagePath;
+        $validated['processing_status'] = $validated['processing_status'] ?? 'Belum diolah';
 
         WasteScan::create($validated);
 
-        return redirect()->route('community-map')->with('success', 'Dokumentasi pemindaian AI berhasil disimpan ke Peta & Log Kelompok Tani!');
+        return redirect()
+            ->route('community-map')
+            ->with('success', 'Dokumentasi pemindaian AI berhasil disimpan ke Peta dan Log Kelompok Tani.');
     }
 
     public function communityMap()
     {
         return Inertia::render('CommunityMap', [
             'scans' => WasteScan::latest()->get(),
+            'trashedScans' => WasteScan::onlyTrashed()->latest()->take(20)->get(),
         ]);
+    }
+
+    public function updateScanStatus(Request $request, WasteScan $scan)
+    {
+        $validated = $request->validate([
+            'processing_status' => 'required|in:Belum diolah,Diproses,Selesai',
+        ]);
+
+        $scan->update([
+            'processing_status' => $validated['processing_status'],
+        ]);
+
+        return back()->with('success', "Status pengolahan {$scan->farmer_group_name} diperbarui menjadi {$validated['processing_status']}.");
+    }
+
+    public function destroyScan(WasteScan $scan)
+    {
+        $groupName = $scan->farmer_group_name;
+        $scan->delete();
+
+        return back()->with('success', "Dokumentasi {$groupName} dipindahkan ke arsip terhapus.");
+    }
+
+    public function restoreScan(int $id)
+    {
+        $scan = WasteScan::onlyTrashed()->findOrFail($id);
+        $scan->restore();
+
+        return back()->with('success', "Dokumentasi {$scan->farmer_group_name} berhasil dipulihkan ke peta dan tabel.");
     }
 
     public function contact()
@@ -130,8 +179,7 @@ class TaniArangController extends Controller
             'message' => 'required|string|max:1500',
         ]);
 
-        $validated['status'] = 'Terkirim — Diterima Koordinator Regional';
-
+        $validated['status'] = 'Terkirim - Diterima Koordinator Regional';
         ContactMessage::create($validated);
 
         return back()->with('success', 'Pesan kolaborasi berhasil tercatat di sistem TaniArang Hub!');
