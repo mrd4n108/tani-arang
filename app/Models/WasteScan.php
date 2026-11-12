@@ -4,10 +4,11 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class WasteScan extends Model
 {
-    use HasFactory;
+    use HasFactory, SoftDeletes;
 
     protected $fillable = [
         'farmer_group_name',
@@ -21,6 +22,7 @@ class WasteScan extends Model
         'ai_confidence',
         'ai_summary_recommendation',
         'ai_next_steps',
+        'processing_status',
     ];
 
     protected $casts = [
