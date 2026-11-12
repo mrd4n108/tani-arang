@@ -17,6 +17,8 @@ return new class extends Migration
             $table->string('email')->unique();
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
+            $table->string('role')->default('poktan_coordinator');
+            $table->string('region')->default('Jawa Timur');
             $table->rememberToken();
             $table->timestamps();
         });

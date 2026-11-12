@@ -3,33 +3,33 @@
 @tailwind utilities;
 
 @layer utilities {
-    .glass-panel {
-        @apply relative bg-slate-900/40 backdrop-blur-xl border border-emerald-500/20 shadow-[0_8px_32px_0_rgba(0,0,0,0.45)] hover:border-emerald-400/50 transition-all duration-300 before:absolute before:inset-x-0 before:top-0 before:h-px before:bg-gradient-to-r before:from-transparent before:via-emerald-400/60 before:to-transparent;
+    .focus-ring {
+        @apply focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2 focus-visible:ring-offset-carbon-900;
     }
 }
 
-/* Custom Dark Scrollbar */
+/* Custom Clean Scrollbar */
 ::-webkit-scrollbar {
-    width: 8px;
-    height: 8px;
+    width: 6px;
+    height: 6px;
 }
 ::-webkit-scrollbar-track {
-    background: #060B0E;
+    background: #121316;
 }
 ::-webkit-scrollbar-thumb {
-    background: rgba(16, 185, 129, 0.3);
+    background: #2D3037;
     border-radius: 9999px;
 }
 ::-webkit-scrollbar-thumb:hover {
-    background: rgba(16, 185, 129, 0.6);
+    background: #3F434D;
 }
 
-/* Custom Leaflet Popup Glassmorphism */
+/* Leaflet Popup Clean Dark Overrides */
 .leaflet-popup-content-wrapper,
 .leaflet-popup-tip {
-    background: rgba(15, 23, 42, 0.92) !important;
-    backdrop-filter: blur(16px);
-    color: #f1f5f9 !important;
-    border: 1px solid rgba(16, 185, 129, 0.35);
-    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.6) !important;
+    background: #18191D !important;
+    color: #F5F5F4 !important;
+    border: 1px solid #2D3037 !important;
+    box-shadow: 0 12px 28px rgba(0, 0, 0, 0.5) !important;
+    border-radius: 12px !important;
 }
