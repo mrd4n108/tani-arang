@@ -1,8 +1,10 @@
 import React from 'react';
 import { Head, Link } from '@inertiajs/react';
 import AppLayout from '@/Layouts/AppLayout';
-import Interactive3DCard from '@/Components/Interactive3DCard';
-import Biochar3DMoleculeHero from '@/Components/Biochar3DMoleculeHero';
+import Card from '@/Components/Card';
+import Button from '@/Components/Button';
+import Badge from '@/Components/Badge';
+import StatCard from '@/Components/StatCard';
 import {
     ResponsiveContainer,
     BarChart,
@@ -28,16 +30,19 @@ import {
     ArrowUpRight,
     CheckCircle2,
     MapPin,
+    ShieldCheck,
+    Layers,
+    Wheat,
 } from 'lucide-react';
 
-const CustomGlassTooltip = ({ active, payload, label }) => {
+const CustomCarbonTooltip = ({ active, payload, label }) => {
     if (active && payload && payload.length) {
         return (
-            <div className="glass-panel rounded-xl p-3 border border-emerald-400/50 text-xs font-mono shadow-2xl">
-                <p className="font-bold text-white mb-1">{label}</p>
+            <div className="bg-carbon-900 border border-carbon-700 rounded-xl p-3 text-xs shadow-xl text-stone-200">
+                <p className="font-bold text-stone-100 mb-1">{label}</p>
                 {payload.map((entry, idx) => (
-                    <p key={idx} style={{ color: entry.color || '#10B981' }}>
-                        {entry.name}: <span className="font-bold">{entry.value}</span>
+                    <p key={idx} style={{ color: entry.color || '#22C55E' }}>
+                        {entry.name}: <span className="font-bold text-stone-100">{entry.value}</span>
                     </p>
                 ))}
             </div>
@@ -45,6 +50,45 @@ const CustomGlassTooltip = ({ active, payload, label }) => {
     }
     return null;
 };
+
+const COMMODITY_MATRIX = [
+    {
+        name: 'Silika Sekam Padi',
+        region: 'Ngawi & Lamongan',
+        nutrient: 'SiO2 > 85% (Silika Aktif)',
+        role: 'Memperkuat batang padi dan daya tahan serangan hama wereng',
+        icon: Wheat,
+        tag: 'Ketahanan Batang',
+        tagVariant: 'foliage',
+    },
+    {
+        name: 'Kalium Kulit Kakao',
+        region: 'Majene & Polman',
+        nutrient: 'K2O hingga 40% abu, pH 9.2',
+        role: 'Memulihkan pH asam dan menekan jamur akar Phytophthora',
+        icon: Flame,
+        tag: 'Korektor pH & Hara',
+        tagVariant: 'harvest',
+    },
+    {
+        name: 'Karbon Tongkol Jagung',
+        region: 'Malang & Lamongan',
+        nutrient: 'Porositas Mikro Tinggi',
+        role: 'Meningkatkan KTK tanah dan menahan cadangan air saat kemarau',
+        icon: Layers,
+        tag: 'Retensi Air',
+        tagVariant: 'soil',
+    },
+    {
+        name: 'Topsoil Jerami Padi',
+        region: 'Lamongan & Ngawi',
+        nutrient: 'C-Organik Humat Tanah',
+        role: 'Menaikkan kandungan organik tanah sawah dari <2% ke >3%',
+        icon: Sprout,
+        tag: 'Rehabilitasi Tanah',
+        tagVariant: 'terracotta',
+    },
+];
 
 export default function Dashboard({
     totalScansCount = 10,
@@ -55,335 +99,394 @@ export default function Dashboard({
 }) {
     const kpiCards = [
         {
-            title: 'Potensi Limbah Padi & Jagung Jatim',
-            value: '6.2 Juta Ton/Thn',
-            subtitle: 'Fakta BPS & Kementan RI (Sentra Lamongan, Ngawi, Malang)',
-            badge: 'SUMBER KARBON',
+            title: 'Potensi Residu Panen Jatim',
+            value: '6.2 Juta Ton',
+            subtitle: 'Sentra Lamongan, Ngawi, Malang (BPS & Kementan RI)',
             icon: Sprout,
-            accent: 'text-emerald-400',
-            glow: 'rgba(16, 185, 129, 0.28)',
+            iconColor: 'text-emerald-400',
+            iconBg: 'bg-emerald-950/60',
         },
         {
-            title: 'Rasio Limbah Kulit Kakao Sulbar',
-            value: '72.5% Bobot Panen',
-            subtitle: 'Sentra Majene & Polewali Mandar — Rawan Jamur Phytophthora',
-            badge: 'POTENSI KALIUM',
+            title: 'Rasio Residu Kulit Kakao Sulbar',
+            value: '72.5% Panen',
+            subtitle: 'Sentra Majene & Polewali Mandar: Rawan Jamur',
             icon: Flame,
-            accent: 'text-amber-400',
-            glow: 'rgba(245, 158, 11, 0.25)',
+            iconColor: 'text-amber-400',
+            iconBg: 'bg-amber-950/60',
         },
         {
-            title: 'Lahan Kritis Bahan Organik (<2%)',
-            value: '~70% Lahan Intensif',
-            subtitle: 'Dampak pemupukan sintetis jangka panjang & pembakaran jerami',
-            badge: 'DARURAT TANAH',
+            title: 'Lahan Kritis C-Organik (<2%)',
+            value: '~70% Sawah',
+            subtitle: 'Dampak pemupukan kimia intensif & bakar jerami',
             icon: AlertTriangle,
-            accent: 'text-cyan-400',
-            glow: 'rgba(6, 182, 212, 0.25)',
+            iconColor: 'text-orange-400',
+            iconBg: 'bg-orange-950/60',
         },
         {
-            title: 'Total Dokumentasi Komunitas TaniArang',
-            value: `${totalScansCount} Titik Terverifikasi`,
-            subtitle: 'Data real-time hasil pemindaian AI Kelompok Tani mitra',
-            badge: 'LIVE DATABASE',
+            title: 'Titik Data Komunitas',
+            value: `${totalScansCount} Lokasi`,
+            subtitle: 'Dokumentasi pemindaian Kelompok Tani terverifikasi',
             icon: Database,
-            accent: 'text-emerald-300',
-            glow: 'rgba(16, 185, 129, 0.3)',
+            iconColor: 'text-emerald-400',
+            iconBg: 'bg-emerald-950/60',
         },
     ];
 
     return (
         <AppLayout>
-            <Head title="Beranda & Dashboard Statistik" />
+            <Head title="Beranda & Dashboard Data Biochar" />
 
-            {/* 1. Futuristic 3D Hero Section */}
-            <section className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center mb-12">
+            {/* 1. Hero Section */}
+            <section className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start mb-12">
                 <div className="lg:col-span-7 space-y-5">
-                    <div className="inline-flex flex-wrap items-center gap-2 px-3.5 py-1.5 rounded-full bg-emerald-500/10 border border-emerald-400/30 text-xs font-mono text-emerald-300">
-                        <span>PSN SWASEMBADA PANGAN</span>
-                        <span>•</span>
-                        <span>SDGs 12, 13 & 15</span>
-                        <span>•</span>
-                        <span className="text-amber-300">TANPA KALKULATOR RUMIT</span>
-                    </div>
+                    <span className="text-sm font-semibold text-emerald-400 block tracking-wide">
+                        Inisiatif Biochar Pertanian Indonesia
+                    </span>
 
-                    <h1 className="font-display font-extrabold text-3xl sm:text-5xl lg:text-[52px] leading-[1.08] tracking-tight text-white">
-                        Hentikan Asap Pembakaran.{' '}
-                        <span className="bg-gradient-to-r from-emerald-400 via-cyan-300 to-amber-300 bg-clip-text text-transparent">
-                            Ubah Limbah Panen Jadi Emas Hitam Biochar.
+                    <h1 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold tracking-tight text-white leading-tight">
+                        Hentikan Pembakaran Terbuka,{' '}
+                        <span className="text-emerald-400">
+                            Ubah Residu Panen Jadi Biochar Tani.
                         </span>
                     </h1>
 
-                    <p className="text-slate-300 text-base sm:text-lg leading-relaxed max-w-2xl">
-                        Portal data faktual dan pemindai visual berbasis AI untuk membantu Kelompok Tani di{' '}
-                        <strong className="text-emerald-300">Jawa Timur</strong> dan{' '}
-                        <strong className="text-amber-300">Sulawesi Barat</strong> mengolah limbah jerami, sekam, tongkol jagung, dan kulit kakao menjadi arang pertanian penyubur tanah.
+                    <p className="text-stone-300 text-base sm:text-lg leading-relaxed max-w-2xl">
+                        Platform data faktual dan pemindai foto berbasis AI untuk mendampingi petani di Jawa Timur dan Sulawesi Barat menghentikan pembakaran terbuka dan mengonversi jerami, sekam, tongkol jagung, serta kulit kakao menjadi arang aktif penyubur tanah.
                     </p>
 
                     <div className="flex flex-wrap items-center gap-3 pt-2">
-                        <Link
+                        <Button
+                            as={Link}
                             href="/scanner"
-                            className="inline-flex items-center gap-2.5 px-6 py-3.5 rounded-2xl bg-gradient-to-r from-emerald-500 to-teal-400 text-slate-950 font-display font-bold text-sm shadow-[0_0_30px_rgba(16,185,129,0.45)] hover:scale-[1.02] transition"
+                            variant="primary"
+                            size="lg"
                         >
-                            <Camera className="w-5 h-5" />
-                            Pindai Foto Limbah Sekarang
-                            <ArrowUpRight className="w-4 h-4" />
-                        </Link>
-                        <Link
+                            <Camera className="w-5 h-5 mr-2" />
+                            Pindai Foto Limbah
+                            <ArrowUpRight className="w-4 h-4 ml-1.5" />
+                        </Button>
+                        <Button
+                            as={Link}
                             href="/facts"
-                            className="inline-flex items-center gap-2 px-5 py-3.5 rounded-2xl glass-panel text-slate-100 hover:text-emerald-300 font-medium text-sm"
+                            variant="secondary"
+                            size="lg"
                         >
-                            <BookOpen className="w-4 h-4 text-emerald-400" />
-                            Bandingkan: Dibakar vs Biochar
-                        </Link>
+                            <BookOpen className="w-4 h-4 text-emerald-400 mr-2" />
+                            Pelajari Fakta
+                        </Button>
+                        <Button
+                            as={Link}
+                            href="/community-map"
+                            variant="outline"
+                            size="lg"
+                        >
+                            <MapPin className="w-4 h-4 text-stone-400 mr-2" />
+                            Peta Sebaran
+                        </Button>
+                    </div>
+
+                    <div className="pt-2 flex items-center gap-6 text-xs text-stone-400">
+                        <span className="flex items-center gap-1.5">
+                            <ShieldCheck className="w-4 h-4 text-emerald-400" />
+                            Rujukan Balittanah & BPS RI
+                        </span>
+                        <span>Metode Pirolisis Bersih Kon-Tiki</span>
                     </div>
                 </div>
 
-                {/* Interactive 3D Rotating Molecular Sphere / Carbon Matrix */}
+                {/* 4 Commodities Grid */}
                 <div className="lg:col-span-5">
-                    <Biochar3DMoleculeHero />
+                    <Card className="p-6">
+                        <div className="mb-4 pb-3 border-b border-carbon-700/60">
+                            <h2 className="font-bold text-base text-white">
+                                Karakteristik 4 Komoditas Biochar
+                            </h2>
+                            <p className="text-xs text-stone-400 mt-0.5">
+                                Potensi hara dan perbaikan struktur tanah per komoditas sentra
+                            </p>
+                        </div>
+
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                            {COMMODITY_MATRIX.map((item, idx) => {
+                                const IconComponent = item.icon;
+                                return (
+                                    <div
+                                        key={idx}
+                                        className="p-3.5 rounded-xl bg-carbon-900 border border-carbon-700/60 flex flex-col justify-between space-y-2"
+                                    >
+                                        <div>
+                                            <div className="flex items-center justify-between gap-1 mb-1.5">
+                                                <Badge variant={item.tagVariant} size="sm">
+                                                    {item.tag}
+                                                </Badge>
+                                                <IconComponent className="w-4 h-4 text-stone-400" />
+                                            </div>
+                                            <h3 className="font-semibold text-sm text-stone-100">
+                                                {item.name}
+                                            </h3>
+                                            <p className="text-xs text-emerald-400 mt-0.5">
+                                                {item.nutrient}
+                                            </p>
+                                        </div>
+
+                                        <div className="pt-2 border-t border-carbon-800 text-xs text-stone-400 leading-snug">
+                                            <p>{item.role}</p>
+                                            <p className="mt-1 text-[11px] text-stone-500">
+                                                Sentra: {item.region}
+                                            </p>
+                                        </div>
+                                    </div>
+                                );
+                            })}
+                        </div>
+                    </Card>
                 </div>
             </section>
 
-            {/* 2. 4 3D-Tilt KPI Cards (Bento Grid Row 1) */}
+            {/* 2. 4 Telemetry KPI StatCards */}
             <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 mb-8">
-                {kpiCards.map((card, index) => {
-                    const Icon = card.icon;
-                    return (
-                        <Interactive3DCard key={index} className="p-5" glowColor={card.glow}>
-                            <div className="flex items-center justify-between mb-3">
-                                <span className="px-2.5 py-0.5 rounded-md text-[10px] font-mono font-semibold bg-slate-800/90 text-slate-300 border border-slate-700">
-                                    {card.badge}
-                                </span>
-                                <div className="w-9 h-9 rounded-xl bg-slate-800/80 border border-emerald-500/30 flex items-center justify-center">
-                                    <Icon className={`w-5 h-5 ${card.accent}`} />
-                                </div>
-                            </div>
-                            <div className={`font-mono font-bold text-2xl sm:text-3xl ${card.accent} mb-1`}>
-                                {card.value}
-                            </div>
-                            <h2 className="font-display font-bold text-sm text-white mb-1">
-                                {card.title}
-                            </h2>
-                            <p className="text-xs text-slate-400 leading-relaxed">
-                                {card.subtitle}
-                            </p>
-                        </Interactive3DCard>
-                    );
-                })}
+                {kpiCards.map((card, index) => (
+                    <StatCard
+                        key={index}
+                        title={card.title}
+                        value={card.value}
+                        subtitle={card.subtitle}
+                        icon={card.icon}
+                        iconColor={card.iconColor}
+                        iconBg={card.iconBg}
+                    />
+                ))}
             </section>
 
-            {/* 3. Interactive Recharts Bento Grid (Bar Chart + Donut Chart) */}
+            {/* 3. Recharts Agricultural Cockpit Grid (Bar Chart + Donut Chart) */}
             <section className="grid grid-cols-1 lg:grid-cols-12 gap-6 mb-8">
-                {/* Bar Chart: Timbulan Limbah vs Pemanfaatan Arang Tani */}
-                <Interactive3DCard className="lg:col-span-7 p-6" intensity={4}>
-                    <div className="flex flex-wrap items-center justify-between gap-2 mb-5">
-                        <div>
-                            <span className="text-xs font-mono text-emerald-400 uppercase">
-                                ANALISIS KLASTER DAERAH (RIBU TON/TAHUN)
-                            </span>
-                            <h3 className="font-display font-bold text-lg text-white">
-                                Timbulan Limbah Panen vs Konversi Arang Tani
-                            </h3>
-                        </div>
-                        <span className="px-2.5 py-1 rounded-lg bg-emerald-500/10 border border-emerald-500/30 font-mono text-xs text-emerald-300">
-                            Jatim & Sulbar
-                        </span>
+                {/* Bar Chart: Regional Waste Generation vs Biochar Conversion */}
+                <Card className="lg:col-span-7 p-6">
+                    <div className="mb-5">
+                        <h3 className="font-bold text-lg text-white">
+                            Timbulan Residu Panen vs Potensi Biochar
+                        </h3>
+                        <p className="text-xs text-stone-400 mt-0.5">
+                            Data estimasi regional per kabupaten sentra (dalam Ribu Ton/Tahun)
+                        </p>
                     </div>
 
                     <div className="h-72 w-full">
                         <ResponsiveContainer width="100%" height="100%">
-                            <BarChart data={regionalComparison}>
-                                <CartesianGrid stroke="rgba(148, 163, 184, 0.12)" strokeDasharray="3 3" />
-                                <XAxis dataKey="region" fontSize={11} stroke="#94a3b8" tickLine={false} />
-                                <YAxis fontSize={11} stroke="#94a3b8" tickLine={false} />
-                                <Tooltip content={<CustomGlassTooltip />} />
-                                <Legend wrapperStyle={{ fontSize: '12px' }} />
+                            <BarChart data={regionalComparison} margin={{ top: 10, right: 10, left: -15, bottom: 0 }}>
+                                <CartesianGrid stroke="#232E29" strokeDasharray="3 3" vertical={false} />
+                                <XAxis dataKey="region" fontSize={12} stroke="#8B9B92" tickLine={false} />
+                                <YAxis fontSize={12} stroke="#8B9B92" tickLine={false} />
+                                <Tooltip content={<CustomCarbonTooltip />} />
+                                <Legend
+                                    wrapperStyle={{ fontSize: '12px', paddingTop: '10px' }}
+                                    formatter={(value) => <span className="text-stone-300">{value}</span>}
+                                />
                                 <Bar
                                     dataKey="timbulan_ribu_ton"
-                                    fill="#06B6D4"
-                                    name="Total Timbulan Limbah (Ribu Ton)"
-                                    radius={[6, 6, 0, 0]}
+                                    fill="#F59E0B"
+                                    name="Timbulan Limbah (Ribu Ton)"
+                                    radius={[4, 4, 0, 0]}
                                 />
                                 <Bar
                                     dataKey="biochar_terolah_ribu_ton"
-                                    fill="#10B981"
-                                    name="Potensi & Realisasi Biochar (Ribu Ton)"
-                                    radius={[6, 6, 0, 0]}
+                                    fill="#22C55E"
+                                    name="Konversi Biochar (Ribu Ton)"
+                                    radius={[4, 4, 0, 0]}
                                 />
                             </BarChart>
                         </ResponsiveContainer>
                     </div>
-                </Interactive3DCard>
+                </Card>
 
-                {/* Donut Chart: Distribusi Jenis Limbah Terdeteksi AI */}
-                <Interactive3DCard className="lg:col-span-5 p-6" intensity={5}>
-                    <div className="mb-4">
-                        <span className="text-xs font-mono text-amber-400 uppercase">
-                            TELEMETRI PEMINDAI AI
-                        </span>
-                        <h3 className="font-display font-bold text-lg text-white">
-                            Distribusi Biomassa Terdeteksi Komunitas
-                        </h3>
-                    </div>
+                {/* Donut Chart: Commodity Distribution */}
+                <Card className="lg:col-span-5 p-6 flex flex-col justify-between">
+                    <div>
+                        <div className="mb-4">
+                            <h3 className="font-bold text-lg text-white">
+                                Proporsi Jenis Residu Terdata
+                            </h3>
+                            <p className="text-xs text-stone-400 mt-0.5">
+                                Sebaran komoditas limbah yang teridentifikasi di lapangan
+                            </p>
+                        </div>
 
-                    <div className="h-60 w-full">
-                        <ResponsiveContainer width="100%" height="100%">
-                            <PieChart>
-                                <Pie
-                                    cx="50%"
-                                    cy="50%"
-                                    data={wasteDistribution}
-                                    dataKey="value"
-                                    innerRadius={55}
-                                    nameKey="name"
-                                    outerRadius={85}
-                                    paddingAngle={4}
-                                >
-                                    {wasteDistribution.map((entry, idx) => (
-                                        <Cell key={idx} fill={entry.color} />
-                                    ))}
-                                </Pie>
-                                <Tooltip content={<CustomGlassTooltip />} />
-                            </PieChart>
-                        </ResponsiveContainer>
+                        <div className="h-56 w-full">
+                            <ResponsiveContainer width="100%" height="100%">
+                                <PieChart>
+                                    <Pie
+                                        cx="50%"
+                                        cy="50%"
+                                        data={wasteDistribution}
+                                        dataKey="value"
+                                        innerRadius={50}
+                                        nameKey="name"
+                                        outerRadius={80}
+                                        paddingAngle={4}
+                                        stroke="#161E1A"
+                                        strokeWidth={2}
+                                    >
+                                        {wasteDistribution.map((entry, idx) => (
+                                            <Cell key={idx} fill={entry.color} />
+                                        ))}
+                                    </Pie>
+                                    <Tooltip content={<CustomCarbonTooltip />} />
+                                </PieChart>
+                            </ResponsiveContainer>
+                        </div>
                     </div>
 
                     <div className="grid grid-cols-2 gap-2 mt-2">
                         {wasteDistribution.map((item, idx) => (
                             <div
                                 key={idx}
-                                className="flex items-center justify-between px-3 py-1.5 rounded-xl bg-slate-950/60 border border-slate-800 text-xs"
+                                className="flex items-center justify-between px-3 py-2 rounded-xl bg-carbon-900 border border-carbon-700/60 text-xs"
                             >
-                                <span className="flex items-center gap-2 text-slate-300">
+                                <span className="flex items-center gap-2 text-stone-300 truncate mr-1">
                                     <span
-                                        className="w-2.5 h-2.5 rounded-full"
+                                        className="w-2.5 h-2.5 rounded-full shrink-0"
                                         style={{ backgroundColor: item.color }}
                                     />
-                                    {item.name}
+                                    <span className="truncate">{item.name}</span>
                                 </span>
-                                <span className="font-mono font-bold text-white">
+                                <span className="font-semibold text-white shrink-0">
                                     {item.value} log
                                 </span>
                             </div>
                         ))}
                     </div>
-                </Interactive3DCard>
+                </Card>
             </section>
 
-            {/* 4. Area Chart Trend & Live Recent Community Logs */}
+            {/* 4. Area Chart Trend & Verified Recent Scans Feed */}
             <section className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-                {/* Area Chart: Tren Pengurangan Pembakaran Terbuka */}
-                <Interactive3DCard className="lg:col-span-7 p-6" intensity={4}>
-                    <div className="flex flex-wrap items-center justify-between gap-2 mb-4">
-                        <div>
-                            <span className="text-xs font-mono text-cyan-400 uppercase">
-                                DAMPAK LINGKUNGAN (HEKTAR LAHAN MITRA)
-                            </span>
-                            <h3 className="font-display font-bold text-lg text-white">
-                                Tren Penurunan Pembakaran Terbuka vs Adopsi Biochar
-                            </h3>
-                        </div>
-                        <span className="px-2.5 py-1 rounded-lg bg-emerald-500/15 text-emerald-300 font-mono text-xs">
-                            -82% Asap PM2.5
-                        </span>
+                {/* Area Chart: Open Burning Reduction vs Biochar Adoption */}
+                <Card className="lg:col-span-7 p-6">
+                    <div className="mb-4">
+                        <h3 className="font-bold text-lg text-white">
+                            Tren Penurunan Lahan Pembakaran Terbuka
+                        </h3>
+                        <p className="text-xs text-stone-400 mt-0.5">
+                            Luas lahan terdampak program substitusi biochar (Hektar)
+                        </p>
                     </div>
 
                     <div className="h-64 w-full">
                         <ResponsiveContainer width="100%" height="100%">
-                            <AreaChart data={monthlyTrend}>
+                            <AreaChart data={monthlyTrend} margin={{ top: 10, right: 10, left: -15, bottom: 0 }}>
                                 <defs>
                                     <linearGradient id="biocharGrad" x1="0" y1="0" x2="0" y2="1">
-                                        <stop offset="5%" stopColor="#10B981" stopOpacity={0.55} />
-                                        <stop offset="95%" stopColor="#10B981" stopOpacity={0.0} />
+                                        <stop offset="5%" stopColor="#22C55E" stopOpacity={0.4} />
+                                        <stop offset="95%" stopColor="#22C55E" stopOpacity={0.0} />
                                     </linearGradient>
                                     <linearGradient id="burnGrad" x1="0" y1="0" x2="0" y2="1">
-                                        <stop offset="5%" stopColor="#F59E0B" stopOpacity={0.45} />
-                                        <stop offset="95%" stopColor="#F59E0B" stopOpacity={0.0} />
+                                        <stop offset="5%" stopColor="#F97316" stopOpacity={0.4} />
+                                        <stop offset="95%" stopColor="#F97316" stopOpacity={0.0} />
                                     </linearGradient>
                                 </defs>
-                                <CartesianGrid stroke="rgba(148, 163, 184, 0.12)" strokeDasharray="3 3" />
-                                <XAxis dataKey="bulan" fontSize={11} stroke="#94a3b8" />
-                                <YAxis fontSize={11} stroke="#94a3b8" />
-                                <Tooltip content={<CustomGlassTooltip />} />
-                                <Legend wrapperStyle={{ fontSize: '12px' }} />
+                                <CartesianGrid stroke="#232E29" strokeDasharray="3 3" vertical={false} />
+                                <XAxis dataKey="bulan" fontSize={12} stroke="#8B9B92" tickLine={false} />
+                                <YAxis fontSize={12} stroke="#8B9B92" tickLine={false} />
+                                <Tooltip content={<CustomCarbonTooltip />} />
+                                <Legend
+                                    wrapperStyle={{ fontSize: '12px', paddingTop: '10px' }}
+                                    formatter={(value) => <span className="text-stone-300">{value}</span>}
+                                />
                                 <Area
                                     type="monotone"
                                     dataKey="konversi_biochar_ha"
                                     fill="url(#biocharGrad)"
                                     fillOpacity={1}
-                                    name="Lahan Aplikasi Biochar (Ha)"
-                                    stroke="#10B981"
-                                    strokeWidth={2.5}
+                                    name="Lahan Biochar (Ha)"
+                                    stroke="#22C55E"
+                                    strokeWidth={2}
                                 />
                                 <Area
                                     type="monotone"
                                     dataKey="pembakaran_terbuka_ha"
                                     fill="url(#burnGrad)"
                                     fillOpacity={1}
-                                    name="Kasus Pembakaran Terbuka (Ha)"
-                                    stroke="#F59E0B"
+                                    name="Pembakaran Terbuka (Ha)"
+                                    stroke="#F97316"
                                     strokeWidth={2}
                                 />
                             </AreaChart>
                         </ResponsiveContainer>
                     </div>
-                </Interactive3DCard>
+                </Card>
 
                 {/* Recent Verified Scans Snapshot */}
-                <Interactive3DCard className="lg:col-span-5 p-6 flex flex-col justify-between" intensity={5}>
+                <Card className="lg:col-span-5 p-6 flex flex-col justify-between">
                     <div>
                         <div className="flex items-center justify-between mb-4">
                             <div>
-                                <span className="text-xs font-mono text-emerald-400 uppercase">
-                                    AKTIVITAS LAPANGAN TERBARU
-                                </span>
-                                <h3 className="font-display font-bold text-lg text-white">
-                                    Log Dokumentasi Kelompok Tani
+                                <h3 className="font-bold text-lg text-white">
+                                    Dokumentasi Lapangan Terakhir
                                 </h3>
+                                <p className="text-xs text-stone-400 mt-0.5">
+                                    Log verifikasi kelompok tani mitra
+                                </p>
                             </div>
                             <Link
                                 href="/community-map"
-                                className="text-xs font-mono text-emerald-300 hover:underline flex items-center gap-1"
+                                className="text-xs font-semibold text-emerald-400 hover:text-emerald-300 flex items-center gap-1"
                             >
-                                Lihat Peta <ArrowUpRight className="w-3.5 h-3.5" />
+                                Peta Lengkap <ArrowUpRight className="w-3.5 h-3.5" />
                             </Link>
                         </div>
 
-                        <div className="space-y-3">
-                            {recentScans.map((scan) => (
-                                <div
-                                    key={scan.id}
-                                    className="p-3 rounded-xl bg-slate-950/65 border border-emerald-500/20 flex items-start justify-between gap-3"
-                                >
-                                    <div>
-                                        <div className="font-semibold text-sm text-white flex items-center gap-1.5">
-                                            <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
-                                            {scan.farmer_group_name}
+                        {recentScans && recentScans.length > 0 ? (
+                            <div className="space-y-3">
+                                {recentScans.map((scan) => (
+                                    <div
+                                        key={scan.id}
+                                        className="p-3 rounded-xl bg-carbon-900 border border-carbon-700/60 flex items-start justify-between gap-3"
+                                    >
+                                        <div className="min-w-0">
+                                            <div className="font-semibold text-sm text-stone-100 flex items-center gap-1.5 truncate">
+                                                <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
+                                                <span className="truncate">{scan.farmer_group_name}</span>
+                                            </div>
+                                            <div className="text-xs text-stone-400 flex items-center gap-1.5 mt-1">
+                                                <MapPin className="w-3.5 h-3.5 text-stone-500 shrink-0" />
+                                                <span className="truncate">
+                                                    {scan.regency} • {scan.detected_waste_type}
+                                                </span>
+                                            </div>
+                                            {scan.moisture_condition && (
+                                                <span className="inline-block mt-1 text-xs text-stone-400">
+                                                    Kondisi: {scan.moisture_condition}
+                                                </span>
+                                            )}
                                         </div>
-                                        <div className="text-xs text-slate-400 flex items-center gap-1 mt-0.5">
-                                            <MapPin className="w-3 h-3 text-cyan-400" />
-                                            {scan.regency} • {scan.detected_waste_type}
-                                        </div>
+                                        <Badge variant="foliage" size="sm" className="shrink-0">
+                                            {Math.round(scan.ai_confidence)}% Akurasi
+                                        </Badge>
                                     </div>
-                                    <span className="shrink-0 px-2 py-0.5 rounded-md font-mono text-[11px] bg-emerald-500/15 text-emerald-300 border border-emerald-500/30">
-                                        {scan.ai_confidence}% AI
-                                    </span>
+                                ))}
+                            </div>
+                        ) : (
+                            <div className="py-8 px-4 rounded-xl bg-carbon-900 border border-carbon-700/60 text-center space-y-3">
+                                <div className="w-10 h-10 rounded-full bg-carbon-800 mx-auto flex items-center justify-center text-stone-400">
+                                    <Camera className="w-5 h-5" />
                                 </div>
-                            ))}
-                        </div>
+                                <p className="text-sm font-medium text-stone-300">
+                                    Belum ada data dokumentasi
+                                </p>
+                            </div>
+                        )}
                     </div>
 
-                    <div className="mt-4 pt-3 border-t border-emerald-500/20 flex items-center justify-between text-xs text-slate-400">
-                        <span>Ingin menambahkan dokumentasi Poktan Anda?</span>
+                    <div className="mt-4 pt-3 border-t border-carbon-700/60 flex items-center justify-between text-xs text-stone-400">
+                        <span>Punya foto tumpukan limbah panen?</span>
                         <Link
                             href="/scanner"
-                            className="font-mono text-emerald-300 font-semibold hover:text-emerald-200"
+                            className="text-emerald-400 font-semibold hover:text-emerald-300"
                         >
-                            + Pindai Baru →
+                            Uji di Pemindai
                         </Link>
                     </div>
-                </Interactive3DCard>
+                </Card>
             </section>
         </AppLayout>
     );

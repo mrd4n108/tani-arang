@@ -1,27 +1,101 @@
-*.log
-.DS_Store
+# -----------------------------------------------------------------------------
+# Environment & Sensitive Files
+# -----------------------------------------------------------------------------
 .env
 .env.backup
 .env.production
-.phpactor.json
-.phpunit.result.cache
+.env.local
+.env.*.local
+/auth.json
+
+# -----------------------------------------------------------------------------
+# AI Agents, Tools & Skills (Local configurations & instructions)
+# -----------------------------------------------------------------------------
+.agents/
+/antigravity/
+antigravity/
+.gemini/
+.claude/
 /.codex
 /.cursor/
-/.idea
-/.nova
-/.phpunit.cache
-/.vscode
-/.zed
-/auth.json
+.windsurf/
+.trae/
+.copilot/
+.chat/
+GEMINI.md
+CLAUDE.md
+AGENTS.md
+resources/AGENTS.md
+**/AGENTS.md
+
+# -----------------------------------------------------------------------------
+# Dependencies & Package Managers
+# -----------------------------------------------------------------------------
 /node_modules
+/vendor
+composer.phar
+
+# -----------------------------------------------------------------------------
+# Laravel & Framework Build / Storage
+# -----------------------------------------------------------------------------
 /public/build
 /public/fonts-manifest.dev.json
 /public/hot
 /public/storage
 /storage/*.key
 /storage/pail
-/vendor
+.phpunit.result.cache
+/.phpunit.cache
+.phpactor.json
 _ide_helper.php
+_ide_helper_models.php
+.phpstorm.meta.php
 Homestead.json
 Homestead.yaml
+
+# -----------------------------------------------------------------------------
+# Frontend Build & Cache
+# -----------------------------------------------------------------------------
+.vite/
+.turbo/
+coverage/
+
+# -----------------------------------------------------------------------------
+# IDEs & Code Editors
+# -----------------------------------------------------------------------------
+/.idea
+.idea/
+/.vscode
+.vscode/
+/.nova
+/.zed
+*.sublime-project
+*.sublime-workspace
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+*~
+
+# -----------------------------------------------------------------------------
+# Logs & Temporary Files
+# -----------------------------------------------------------------------------
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# -----------------------------------------------------------------------------
+# Operating System Files
+# -----------------------------------------------------------------------------
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
 Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/

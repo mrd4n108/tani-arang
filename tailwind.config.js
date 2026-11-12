@@ -11,42 +11,54 @@ export default {
     theme: {
         extend: {
             fontFamily: {
-                display: ['"Syne"', ...defaultTheme.fontFamily.sans],
-                sans: ['"Outfit"', ...defaultTheme.fontFamily.sans],
+                display: ['"Plus Jakarta Sans"', ...defaultTheme.fontFamily.sans],
+                sans: ['"Plus Jakarta Sans"', ...defaultTheme.fontFamily.sans],
                 mono: ['"JetBrains Mono"', ...defaultTheme.fontFamily.mono],
             },
             colors: {
-                obsidian: '#060B0E',
+                carbon: {
+                    950: '#0A0B0D',
+                    900: '#121316',
+                    850: '#18191D',
+                    800: '#202227',
+                    700: '#2D3037',
+                    600: '#3F434D',
+                },
+                soil: {
+                    950: '#15100D',
+                    900: '#201814',
+                    800: '#2D231E',
+                    700: '#3E312A',
+                    600: '#554339',
+                    500: '#735C4E',
+                },
+                foliage: {
+                    950: '#071A0B',
+                    900: '#0E2E14',
+                    800: '#1B5E20',
+                    700: '#2E7D32',
+                    600: '#388E3C',
+                    500: '#4CAF50',
+                    400: '#66BB6A',
+                    300: '#81C784',
+                },
+                terracotta: {
+                    900: '#43170B',
+                    800: '#7C2D12',
+                    700: '#9A3412',
+                    600: '#C2410C',
+                    500: '#EA580C',
+                },
+                harvest: {
+                    600: '#D97706',
+                    500: '#F59E0B',
+                },
+                obsidian: '#0F1012',
                 bio: {
-                    emerald: '#10B981',
-                    teal: '#06B6D4',
-                    amber: '#F59E0B',
+                    emerald: '#2E7D32',
+                    teal: '#0E7490',
+                    amber: '#D97706',
                 },
-            },
-            keyframes: {
-                floatSlow: {
-                    '0%, 100%': { transform: 'translateY(0px) rotate(0deg)' },
-                    '50%': { transform: 'translateY(-10px) rotate(1.5deg)' },
-                },
-                laserScan: {
-                    '0%': { top: '0%', opacity: '0.2' },
-                    '50%': { top: '96%', opacity: '1' },
-                    '100%': { top: '0%', opacity: '0.2' },
-                },
-                pulseGlow: {
-                    '0%, 100%': { opacity: '0.4', transform: 'scale(1)' },
-                    '50%': { opacity: '0.85', transform: 'scale(1.06)' },
-                },
-                spinSlow: {
-                    from: { transform: 'rotate(0deg)' },
-                    to: { transform: 'rotate(360deg)' },
-                }
-            },
-            animation: {
-                'float-slow': 'floatSlow 4.5s ease-in-out infinite',
-                'laser-scan': 'laserScan 2.6s ease-in-out infinite',
-                'pulse-glow': 'pulseGlow 3s ease-in-out infinite',
-                'spin-slow': 'spinSlow 18s linear infinite',
             },
         },
     },
