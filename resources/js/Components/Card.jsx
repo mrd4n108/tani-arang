@@ -9,7 +9,7 @@ export function Card({
 }) {
     return (
         <div
-            className={`bg-carbon-850 border border-carbon-700/60 rounded-2xl text-stone-100 shadow-sm ${className}`}
+            className={`bg-white dark:bg-carbon-850 border border-stone-200 dark:border-carbon-700/60 rounded-2xl text-stone-900 dark:text-stone-100 shadow-sm transition-colors ${className}`}
             {...props}
         >
             {children}
@@ -28,7 +28,7 @@ export function CardHeader({ children, className = '', ...props }) {
 export function CardTitle({ children, className = '', as: Component = 'h3', ...props }) {
     return (
         <Component
-            className={`font-sans font-bold text-base sm:text-lg text-stone-100 tracking-tight ${className}`}
+            className={`font-sans font-bold text-base sm:text-lg text-stone-900 dark:text-stone-100 tracking-tight ${className}`}
             {...props}
         >
             {children}
@@ -38,7 +38,7 @@ export function CardTitle({ children, className = '', as: Component = 'h3', ...p
 
 export function CardDescription({ children, className = '', ...props }) {
     return (
-        <p className={`text-xs sm:text-sm text-stone-400 leading-relaxed ${className}`} {...props}>
+        <p className={`text-xs sm:text-sm text-stone-600 dark:text-stone-400 leading-relaxed ${className}`} {...props}>
             {children}
         </p>
     );

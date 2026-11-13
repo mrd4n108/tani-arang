@@ -3,19 +3,19 @@ import { Link } from '@inertiajs/react';
 
 const VARIANTS = {
     primary:
-        'bg-foliage-700 hover:bg-foliage-600 active:bg-foliage-800 text-stone-50 border border-foliage-600/50 shadow-sm',
+        'bg-emerald-600 hover:bg-emerald-500 active:bg-emerald-700 text-white border border-emerald-500/50 shadow-sm',
     secondary:
-        'bg-carbon-800 hover:bg-carbon-700 active:bg-carbon-850 text-stone-200 border border-carbon-700 shadow-sm',
+        'bg-stone-100 hover:bg-stone-200 active:bg-stone-300 text-stone-800 border border-stone-300 dark:bg-carbon-800 dark:hover:bg-carbon-700 dark:active:bg-carbon-850 dark:text-stone-200 dark:border-carbon-700 shadow-sm',
     terracotta:
         'bg-terracotta-700 hover:bg-terracotta-600 active:bg-terracotta-800 text-stone-50 border border-terracotta-600/50 shadow-sm',
     outline:
-        'bg-transparent hover:bg-carbon-800 active:bg-carbon-850 text-stone-300 hover:text-white border border-carbon-700',
+        'bg-transparent hover:bg-stone-100 active:bg-stone-200 text-stone-700 hover:text-stone-900 border border-stone-300 dark:hover:bg-carbon-800 dark:active:bg-carbon-850 dark:text-stone-300 dark:hover:text-white dark:border-carbon-700',
     ghost:
-        'bg-transparent hover:bg-carbon-800 active:bg-carbon-850 text-stone-300 hover:text-white border border-transparent',
+        'bg-transparent hover:bg-stone-100 active:bg-stone-200 text-stone-700 hover:text-stone-900 border border-transparent dark:hover:bg-carbon-800 dark:active:bg-carbon-850 dark:text-stone-300 dark:hover:text-white',
 };
 
 const SIZES = {
-    sm: 'text-xs px-3 py-1.5 min-h-[44px] sm:min-h-[38px] rounded-xl gap-1.5',
+    sm: 'text-xs px-3 py-1.5 min-h-[44px] rounded-xl gap-1.5',
     md: 'text-sm px-4 py-2 min-h-[44px] rounded-xl gap-2 font-medium',
     lg: 'text-base px-5 py-2.5 min-h-[48px] rounded-2xl gap-2.5 font-semibold',
 };

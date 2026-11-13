@@ -1,12 +1,12 @@
 import React from 'react';
 
 const VARIANTS = {
-    foliage: 'bg-emerald-950/70 text-emerald-300',
-    harvest: 'bg-amber-950/70 text-amber-300',
-    terracotta: 'bg-orange-950/70 text-orange-300',
-    carbon: 'bg-carbon-800 text-stone-300',
-    soil: 'bg-stone-800 text-stone-300',
-    outline: 'bg-carbon-800/60 text-stone-300',
+    foliage: 'bg-emerald-100 text-emerald-800 dark:bg-emerald-950/70 dark:text-emerald-300',
+    harvest: 'bg-amber-100 text-amber-800 dark:bg-amber-950/70 dark:text-amber-300',
+    terracotta: 'bg-orange-100 text-orange-800 dark:bg-orange-950/70 dark:text-orange-300',
+    carbon: 'bg-stone-200 text-stone-800 dark:bg-carbon-800 dark:text-stone-300',
+    soil: 'bg-stone-200 text-stone-800 dark:bg-stone-800 dark:text-stone-300',
+    outline: 'bg-transparent border border-stone-300 text-stone-700 dark:border-carbon-700/60 dark:text-stone-300',
 };
 
 const DOT_COLORS = {

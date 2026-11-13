@@ -15,11 +15,25 @@
     <!-- Leaflet Dark Map Styles -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="" />
 
+    <!-- Theme Initialization to Prevent FOUT -->
+    <script>
+        (function() {
+            try {
+                var theme = localStorage.getItem('theme');
+                if (theme === 'light') {
+                    document.documentElement.classList.remove('dark');
+                } else if (theme === 'dark') {
+                    document.documentElement.classList.add('dark');
+                }
+            } catch (e) {}
+        })();
+    </script>
+
     @viteReactRefresh
     @vite(['resources/css/app.css', 'resources/js/app.jsx'])
     @inertiaHead
 </head>
-<body class="font-sans antialiased bg-carbon-900 text-stone-100 selection:bg-foliage-700/30 selection:text-foliage-300 overflow-x-hidden">
+<body class="font-sans antialiased bg-stone-50 text-stone-900 dark:bg-carbon-900 dark:text-stone-100 selection:bg-foliage-700/30 selection:text-foliage-300 overflow-x-hidden transition-colors duration-150">
     @inertia
     <script>
         (function() {

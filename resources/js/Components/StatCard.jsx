@@ -10,8 +10,8 @@ export default function StatCard({
     badge,
     badgeVariant = 'foliage',
     icon: Icon,
-    iconColor = 'text-emerald-400',
-    iconBg = 'bg-carbon-800 text-emerald-400',
+    iconColor = 'text-emerald-600 dark:text-emerald-400',
+    iconBg = 'bg-emerald-50 dark:bg-carbon-800 text-emerald-600 dark:text-emerald-400',
     trend,
     className = '',
     ...props
@@ -38,26 +38,26 @@ export default function StatCard({
                 </div>
 
                 <div className="mb-2">
-                    <span className="font-sans font-extrabold text-2xl sm:text-3xl text-white tracking-tight">
+                    <span className="font-sans font-extrabold text-2xl sm:text-3xl text-stone-900 dark:text-white tracking-tight">
                         {value}
                     </span>
                     {unit && (
-                        <span className="ml-1.5 font-sans text-sm text-stone-400">
+                        <span className="ml-1.5 font-sans text-sm text-stone-500 dark:text-stone-400">
                             {unit}
                         </span>
                     )}
                 </div>
 
-                <h3 className="font-sans font-medium text-sm text-stone-200 mb-1 leading-snug">
+                <h3 className="font-sans font-medium text-sm text-stone-700 dark:text-stone-200 mb-1 leading-snug">
                     {title}
                 </h3>
             </div>
 
             {(subtitle || trend) && (
-                <div className="pt-3 mt-3 border-t border-carbon-700/60 flex items-center justify-between gap-2 text-xs text-stone-400">
+                <div className="pt-3 mt-3 border-t border-stone-200 dark:border-carbon-700/60 flex items-center justify-between gap-2 text-xs text-stone-600 dark:text-stone-400">
                     {subtitle && <p className="leading-relaxed">{subtitle}</p>}
                     {trend && (
-                        <span className="text-emerald-400 shrink-0 font-medium">
+                        <span className="text-emerald-600 dark:text-emerald-400 shrink-0 font-medium">
                             {trend}
                         </span>
                     )}
