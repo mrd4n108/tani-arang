@@ -56,13 +56,13 @@ export default function Contact({ messages = [] }) {
 
             {/* Header */}
             <header className="mb-10">
-                <span className="text-sm font-semibold text-emerald-400 block mb-2">
+                <span className="text-sm font-semibold text-emerald-600 dark:text-emerald-400 block mb-2">
                     Jejaring Ekosistem Biochar Nusantara
                 </span>
-                <h1 className="text-3xl sm:text-4xl font-extrabold text-white tracking-tight">
+                <h1 className="text-3xl sm:text-4xl font-extrabold text-stone-900 dark:text-white tracking-tight">
                     Hubungi Kami & Kolaborasi
                 </h1>
-                <p className="text-stone-300 text-base mt-2 max-w-3xl leading-relaxed">
+                <p className="text-stone-600 dark:text-stone-300 text-base mt-2 max-w-3xl leading-relaxed">
                     Mari berkolaborasi menghentikan pembakaran residu panen terbuka dan memulihkan kesuburan tanah pertanian Indonesia.
                 </p>
             </header>
@@ -71,14 +71,14 @@ export default function Contact({ messages = [] }) {
             {(flash?.success || recentlySuccessful) && (
                 <div
                     role="alert"
-                    className="mb-8 p-4 rounded-xl bg-emerald-950/80 border border-emerald-800/60 flex items-start gap-3 text-emerald-200"
+                    className="mb-8 p-4 rounded-xl bg-emerald-100 dark:bg-emerald-950/80 border border-emerald-300 dark:border-emerald-800/60 flex items-start gap-3 text-emerald-900 dark:text-emerald-200"
                 >
-                    <CheckCircle2 className="w-5 h-5 text-emerald-400 shrink-0 mt-0.5" />
+                    <CheckCircle2 className="w-5 h-5 text-emerald-600 dark:text-emerald-400 shrink-0 mt-0.5" />
                     <div>
-                        <div className="font-bold text-sm text-white">
+                        <div className="font-bold text-sm text-stone-900 dark:text-white">
                             Pesan Kolaborasi Berhasil Dikirim
                         </div>
-                        <p className="text-xs text-emerald-300 mt-0.5">
+                        <p className="text-xs text-emerald-800 dark:text-emerald-300 mt-0.5">
                             {flash?.success || 'Terima kasih atas aspirasi Anda. Koordinator regional kami akan segera menindaklanjuti.'}
                         </p>
                     </div>
@@ -87,25 +87,25 @@ export default function Contact({ messages = [] }) {
 
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 mb-12">
                 {/* Left Column: Partnership Form */}
-                <section className="lg:col-span-7 bg-carbon-850 border border-carbon-700/60 rounded-2xl p-6 sm:p-8 flex flex-col justify-between">
+                <section className="lg:col-span-7 bg-white dark:bg-carbon-850 border border-stone-200 dark:border-carbon-700/60 rounded-2xl p-6 sm:p-8 flex flex-col justify-between shadow-sm transition-colors">
                     <div>
                         <div className="flex items-center gap-2.5 mb-2">
-                            <div className="w-9 h-9 rounded-xl bg-emerald-950/60 flex items-center justify-center text-emerald-400 shrink-0">
+                            <div className="w-9 h-9 rounded-xl bg-emerald-100 dark:bg-emerald-950/60 flex items-center justify-center text-emerald-600 dark:text-emerald-400 shrink-0">
                                 <Handshake className="w-5 h-5" />
                             </div>
-                            <h2 className="font-bold text-xl text-white">
+                            <h2 className="font-bold text-xl text-stone-900 dark:text-white">
                                 Formulir Kemitraan & Pelaporan Titik Limbah
                             </h2>
                         </div>
-                        <p className="text-xs sm:text-sm text-stone-400 mb-6 leading-relaxed">
+                        <p className="text-xs sm:text-sm text-stone-500 dark:text-stone-400 mb-6 leading-relaxed">
                             Pesan Anda langsung tercatat di koordinasi posko lapangan regional TaniArang (Surabaya dan Majene).
                         </p>
 
                         <form onSubmit={handleSubmit} className="space-y-4">
                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                 <div>
-                                    <label htmlFor="contact-name" className="block text-xs text-stone-300 mb-1.5 font-medium">
-                                        Nama Lengkap <span className="text-rose-400">*</span>
+                                    <label htmlFor="contact-name" className="block text-xs text-stone-700 dark:text-stone-300 mb-1.5 font-medium">
+                                        Nama Lengkap <span className="text-rose-500">*</span>
                                     </label>
                                     <input
                                         id="contact-name"
@@ -114,18 +114,18 @@ export default function Contact({ messages = [] }) {
                                         placeholder="Nama Anda"
                                         value={data.name}
                                         onChange={(e) => setData('name', e.target.value)}
-                                        className="w-full min-h-[44px] px-4 py-2.5 rounded-xl bg-carbon-900 border border-carbon-700 text-sm text-white placeholder-stone-500 focus:border-emerald-500 focus:outline-none transition"
+                                        className="w-full min-h-[44px] px-4 py-2.5 rounded-xl bg-stone-50 dark:bg-carbon-900 border border-stone-300 dark:border-carbon-700 text-sm text-stone-900 dark:text-white placeholder-stone-400 dark:placeholder-stone-500 focus:border-emerald-500 focus:outline-none transition"
                                     />
                                     {errors.name && (
-                                        <p className="text-xs text-rose-400 mt-1 flex items-center gap-1">
+                                        <p className="text-xs text-rose-500 mt-1 flex items-center gap-1">
                                             <AlertCircle className="w-3.5 h-3.5 shrink-0" />
                                             {errors.name}
                                         </p>
                                     )}
                                 </div>
                                 <div>
-                                    <label htmlFor="contact-org" className="block text-xs text-stone-300 mb-1.5 font-medium">
-                                        Instansi / Kelompok Tani (Poktan) <span className="text-rose-400">*</span>
+                                    <label htmlFor="contact-org" className="block text-xs text-stone-700 dark:text-stone-300 mb-1.5 font-medium">
+                                        Instansi / Kelompok Tani (Poktan) <span className="text-rose-500">*</span>
                                     </label>
                                     <input
                                         id="contact-org"
@@ -134,10 +134,10 @@ export default function Contact({ messages = [] }) {
                                         placeholder="Nama Poktan / Lembaga"
                                         value={data.organization}
                                         onChange={(e) => setData('organization', e.target.value)}
-                                        className="w-full min-h-[44px] px-4 py-2.5 rounded-xl bg-carbon-900 border border-carbon-700 text-sm text-white placeholder-stone-500 focus:border-emerald-500 focus:outline-none transition"
+                                        className="w-full min-h-[44px] px-4 py-2.5 rounded-xl bg-stone-50 dark:bg-carbon-900 border border-stone-300 dark:border-carbon-700 text-sm text-stone-900 dark:text-white placeholder-stone-400 dark:placeholder-stone-500 focus:border-emerald-500 focus:outline-none transition"
                                     />
                                     {errors.organization && (
-                                        <p className="text-xs text-rose-400 mt-1 flex items-center gap-1">
+                                        <p className="text-xs text-rose-500 mt-1 flex items-center gap-1">
                                             <AlertCircle className="w-3.5 h-3.5 shrink-0" />
                                             {errors.organization}
                                         </p>
@@ -147,8 +147,8 @@ export default function Contact({ messages = [] }) {
 
                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                 <div>
-                                    <label htmlFor="contact-region" className="block text-xs text-stone-300 mb-1.5 font-medium">
-                                        Wilayah Daerah <span className="text-rose-400">*</span>
+                                    <label htmlFor="contact-region" className="block text-xs text-stone-700 dark:text-stone-300 mb-1.5 font-medium">
+                                        Wilayah Daerah <span className="text-rose-500">*</span>
                                     </label>
                                     <input
                                         id="contact-region"
@@ -157,24 +157,24 @@ export default function Contact({ messages = [] }) {
                                         placeholder="Contoh: Kab. Lamongan, Jawa Timur"
                                         value={data.region}
                                         onChange={(e) => setData('region', e.target.value)}
-                                        className="w-full min-h-[44px] px-4 py-2.5 rounded-xl bg-carbon-900 border border-carbon-700 text-sm text-white placeholder-stone-500 focus:border-emerald-500 focus:outline-none transition"
+                                        className="w-full min-h-[44px] px-4 py-2.5 rounded-xl bg-stone-50 dark:bg-carbon-900 border border-stone-300 dark:border-carbon-700 text-sm text-stone-900 dark:text-white placeholder-stone-400 dark:placeholder-stone-500 focus:border-emerald-500 focus:outline-none transition"
                                     />
                                     {errors.region && (
-                                        <p className="text-xs text-rose-400 mt-1 flex items-center gap-1">
+                                        <p className="text-xs text-rose-500 mt-1 flex items-center gap-1">
                                             <AlertCircle className="w-3.5 h-3.5 shrink-0" />
                                             {errors.region}
                                         </p>
                                     )}
                                 </div>
                                 <div>
-                                    <label htmlFor="contact-collab-type" className="block text-xs text-stone-300 mb-1.5 font-medium">
-                                        Kategori Kolaborasi <span className="text-rose-400">*</span>
+                                    <label htmlFor="contact-collab-type" className="block text-xs text-stone-700 dark:text-stone-300 mb-1.5 font-medium">
+                                        Kategori Kolaborasi <span className="text-rose-500">*</span>
                                     </label>
                                     <select
                                         id="contact-collab-type"
                                         value={data.collaboration_type}
                                         onChange={(e) => setData('collaboration_type', e.target.value)}
-                                        className="w-full min-h-[44px] px-4 py-2.5 rounded-xl bg-carbon-900 border border-carbon-700 text-sm text-white focus:border-emerald-500 focus:outline-none transition"
+                                        className="w-full min-h-[44px] px-4 py-2.5 rounded-xl bg-stone-50 dark:bg-carbon-900 border border-stone-300 dark:border-carbon-700 text-sm text-stone-900 dark:text-white focus:border-emerald-500 focus:outline-none transition"
                                     >
                                         <option value="Pendampingan Petani">Pendampingan Petani & Poktan</option>
                                         <option value="Riset Kampus">Riset Kampus & Uji Lab Tanah</option>
@@ -186,7 +186,7 @@ export default function Contact({ messages = [] }) {
                                         </option>
                                     </select>
                                     {errors.collaboration_type && (
-                                        <p className="text-xs text-rose-400 mt-1 flex items-center gap-1">
+                                        <p className="text-xs text-rose-500 mt-1 flex items-center gap-1">
                                             <AlertCircle className="w-3.5 h-3.5 shrink-0" />
                                             {errors.collaboration_type}
                                         </p>
@@ -195,8 +195,8 @@ export default function Contact({ messages = [] }) {
                             </div>
 
                             <div>
-                                <label htmlFor="contact-message" className="block text-xs text-stone-300 mb-1.5 font-medium">
-                                    Pesan atau Rencana Kolaborasi <span className="text-rose-400">*</span>
+                                <label htmlFor="contact-message" className="block text-xs text-stone-700 dark:text-stone-300 mb-1.5 font-medium">
+                                    Pesan atau Rencana Kolaborasi <span className="text-rose-500">*</span>
                                 </label>
                                 <textarea
                                     id="contact-message"
@@ -205,10 +205,10 @@ export default function Contact({ messages = [] }) {
                                     placeholder="Tuliskan detail desa, jenis limbah, atau bentuk kerja sama yang diharapkan..."
                                     value={data.message}
                                     onChange={(e) => setData('message', e.target.value)}
-                                    className="w-full px-4 py-3 rounded-xl bg-carbon-900 border border-carbon-700 text-sm text-white placeholder-stone-500 focus:border-emerald-500 focus:outline-none transition"
+                                    className="w-full px-4 py-3 rounded-xl bg-stone-50 dark:bg-carbon-900 border border-stone-300 dark:border-carbon-700 text-sm text-stone-900 dark:text-white placeholder-stone-400 dark:placeholder-stone-500 focus:border-emerald-500 focus:outline-none transition"
                                 />
                                 {errors.message && (
-                                    <p className="text-xs text-rose-400 mt-1 flex items-center gap-1">
+                                    <p className="text-xs text-rose-500 mt-1 flex items-center gap-1">
                                         <AlertCircle className="w-3.5 h-3.5 shrink-0" />
                                         {errors.message}
                                     </p>
@@ -218,7 +218,7 @@ export default function Contact({ messages = [] }) {
                             <button
                                 type="submit"
                                 disabled={processing}
-                                className="w-full min-h-[44px] inline-flex items-center justify-center gap-2 px-6 py-3 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-semibold text-sm transition disabled:opacity-50"
+                                className="w-full min-h-[44px] inline-flex items-center justify-center gap-2 px-6 py-3 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-semibold text-sm transition disabled:opacity-50 shadow-sm"
                             >
                                 <Send className="w-4 h-4 shrink-0" />
                                 <span>{processing ? 'Mengirim...' : 'Kirim Pesan Kolaborasi'}</span>
@@ -230,45 +230,45 @@ export default function Contact({ messages = [] }) {
                 {/* Right Column: Regional Hubs & FAQ Accordion */}
                 <div className="lg:col-span-5 space-y-6">
                     {/* Regional Coordinator Hubs Card */}
-                    <section className="bg-carbon-850 border border-carbon-700/60 rounded-2xl p-6">
-                        <h3 className="font-bold text-lg text-white mb-4">
+                    <section className="bg-white dark:bg-carbon-850 border border-stone-200 dark:border-carbon-700/60 rounded-2xl p-6 shadow-sm transition-colors">
+                        <h3 className="font-bold text-lg text-stone-900 dark:text-white mb-4">
                             Koordinator Posko Regional
                         </h3>
 
                         <div className="space-y-3.5">
-                            <div className="p-4 rounded-xl bg-carbon-900 border border-carbon-700/60">
-                                <div className="font-bold text-sm text-emerald-400 flex items-center gap-2">
-                                    <Building2 className="w-4 h-4 text-emerald-400 shrink-0" />
+                            <div className="p-4 rounded-xl bg-stone-50 dark:bg-carbon-900 border border-stone-200 dark:border-carbon-700/60">
+                                <div className="font-bold text-sm text-emerald-700 dark:text-emerald-400 flex items-center gap-2">
+                                    <Building2 className="w-4 h-4 text-emerald-600 dark:text-emerald-400 shrink-0" />
                                     Jawa Timur Hub (Surabaya)
                                 </div>
-                                <p className="text-xs text-stone-300 mt-1.5 leading-relaxed">
+                                <p className="text-xs text-stone-600 dark:text-stone-300 mt-1.5 leading-relaxed">
                                     Klaster Jerami & Jagung: Kab. Lamongan, Kab. Ngawi, dan Kab. Malang.
                                 </p>
-                                <div className="mt-2.5 pt-2 border-t border-carbon-800 flex flex-col sm:flex-row sm:items-center gap-2 text-xs text-stone-400">
+                                <div className="mt-2.5 pt-2 border-t border-stone-200 dark:border-carbon-800 flex flex-col sm:flex-row sm:items-center gap-2 text-xs text-stone-500 dark:text-stone-400">
                                     <a
                                         href="mailto:jatim@taniarang.id"
-                                        className="inline-flex items-center gap-1.5 hover:text-emerald-400 transition"
+                                        className="inline-flex items-center gap-1.5 hover:text-emerald-600 dark:hover:text-emerald-400 transition"
                                     >
-                                        <Mail className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
+                                        <Mail className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400 shrink-0" />
                                         jatim@taniarang.id
                                     </a>
                                 </div>
                             </div>
 
-                            <div className="p-4 rounded-xl bg-carbon-900 border border-carbon-700/60">
-                                <div className="font-bold text-sm text-amber-400 flex items-center gap-2">
-                                    <MapPin className="w-4 h-4 text-amber-400 shrink-0" />
+                            <div className="p-4 rounded-xl bg-stone-50 dark:bg-carbon-900 border border-stone-200 dark:border-carbon-700/60">
+                                <div className="font-bold text-sm text-amber-700 dark:text-amber-400 flex items-center gap-2">
+                                    <MapPin className="w-4 h-4 text-amber-600 dark:text-amber-400 shrink-0" />
                                     Sulawesi Barat Hub (Majene)
                                 </div>
-                                <p className="text-xs text-stone-300 mt-1.5 leading-relaxed">
+                                <p className="text-xs text-stone-600 dark:text-stone-300 mt-1.5 leading-relaxed">
                                     Klaster Kakao & Perkebunan: Kab. Majene dan Kab. Polewali Mandar.
                                 </p>
-                                <div className="mt-2.5 pt-2 border-t border-carbon-800 flex flex-col sm:flex-row sm:items-center gap-2 text-xs text-stone-400">
+                                <div className="mt-2.5 pt-2 border-t border-stone-200 dark:border-carbon-800 flex flex-col sm:flex-row sm:items-center gap-2 text-xs text-stone-500 dark:text-stone-400">
                                     <a
                                         href="mailto:sulbar@taniarang.id"
-                                        className="inline-flex items-center gap-1.5 hover:text-amber-400 transition"
+                                        className="inline-flex items-center gap-1.5 hover:text-amber-600 dark:hover:text-amber-400 transition"
                                     >
-                                        <Mail className="w-3.5 h-3.5 text-amber-400 shrink-0" />
+                                        <Mail className="w-3.5 h-3.5 text-amber-600 dark:text-amber-400 shrink-0" />
                                         sulbar@taniarang.id
                                     </a>
                                 </div>
@@ -277,10 +277,10 @@ export default function Contact({ messages = [] }) {
                     </section>
 
                     {/* FAQ Accordion Card */}
-                    <section className="bg-carbon-850 border border-carbon-700/60 rounded-2xl p-6">
+                    <section className="bg-white dark:bg-carbon-850 border border-stone-200 dark:border-carbon-700/60 rounded-2xl p-6 shadow-sm transition-colors">
                         <div className="flex items-center gap-2 mb-4">
-                            <HelpCircle className="w-5 h-5 text-emerald-400 shrink-0" />
-                            <h3 className="font-bold text-lg text-white">
+                            <HelpCircle className="w-5 h-5 text-emerald-600 dark:text-emerald-400 shrink-0" />
+                            <h3 className="font-bold text-lg text-stone-900 dark:text-white">
                                 Pertanyaan yang Sering Diajukan
                             </h3>
                         </div>
@@ -288,23 +288,23 @@ export default function Contact({ messages = [] }) {
                             {FAQS.map((item, idx) => (
                                 <div
                                     key={idx}
-                                    className="rounded-xl bg-carbon-900 border border-carbon-700/60 overflow-hidden"
+                                    className="rounded-xl bg-stone-50 dark:bg-carbon-900 border border-stone-200 dark:border-carbon-700/60 overflow-hidden"
                                 >
                                     <button
                                         type="button"
                                         aria-expanded={openFaq === idx}
                                         onClick={() => setOpenFaq(openFaq === idx ? -1 : idx)}
-                                        className="w-full min-h-[44px] p-3.5 text-left flex items-center justify-between gap-3 text-xs sm:text-sm font-semibold text-white hover:text-emerald-400 transition"
+                                        className="w-full min-h-[44px] p-3.5 text-left flex items-center justify-between gap-3 text-xs sm:text-sm font-semibold text-stone-900 dark:text-white hover:text-emerald-600 dark:hover:text-emerald-400 transition"
                                     >
                                         <span className="leading-snug">{item.q}</span>
                                         <ChevronDown
-                                            className={`w-4 h-4 shrink-0 text-emerald-400 transition-transform duration-200 ${
+                                            className={`w-4 h-4 shrink-0 text-emerald-600 dark:text-emerald-400 transition-transform duration-200 ${
                                                 openFaq === idx ? 'rotate-180' : ''
                                             }`}
                                         />
                                     </button>
                                     {openFaq === idx && (
-                                        <div className="px-3.5 pb-3.5 text-xs text-stone-300 leading-relaxed border-t border-carbon-800 pt-2.5">
+                                        <div className="px-3.5 pb-3.5 text-xs text-stone-600 dark:text-stone-300 leading-relaxed border-t border-stone-200 dark:border-carbon-800 pt-2.5">
                                             {item.a}
                                         </div>
                                     )}
@@ -316,20 +316,20 @@ export default function Contact({ messages = [] }) {
             </div>
 
             {/* Community Collaboration Log */}
-            <section className="bg-carbon-850 border border-carbon-700/60 rounded-2xl p-6 sm:p-8">
+            <section className="bg-white dark:bg-carbon-850 border border-stone-200 dark:border-carbon-700/60 rounded-2xl p-6 sm:p-8 shadow-sm transition-colors">
                 <div className="mb-6">
-                    <h2 className="font-bold text-xl text-white">
+                    <h2 className="font-bold text-xl text-stone-900 dark:text-white">
                         Aspirasi Kolaborasi Terakhir
                     </h2>
-                    <p className="text-xs sm:text-sm text-stone-400 mt-1">
+                    <p className="text-xs sm:text-sm text-stone-500 dark:text-stone-400 mt-1">
                         Daftar pesan inisiatif yang masuk dari kelompok tani dan pendamping lapangan
                     </p>
                 </div>
 
                 {messages.length === 0 ? (
-                    <div className="p-8 rounded-xl bg-carbon-900 border border-carbon-700/60 text-center flex flex-col items-center justify-center">
-                        <Inbox className="w-8 h-8 text-stone-500 mb-2" />
-                        <p className="text-xs text-stone-400">
+                    <div className="p-8 rounded-xl bg-stone-50 dark:bg-carbon-900 border border-stone-200 dark:border-carbon-700/60 text-center flex flex-col items-center justify-center">
+                        <Inbox className="w-8 h-8 text-stone-400 mb-2" />
+                        <p className="text-xs text-stone-500 dark:text-stone-400">
                             Belum ada pesan kolaborasi tercatat
                         </p>
                     </div>
@@ -338,28 +338,28 @@ export default function Contact({ messages = [] }) {
                         {messages.map((msg) => (
                             <div
                                 key={msg.id}
-                                className="p-4 rounded-xl bg-carbon-900 border border-carbon-700/60 flex flex-col justify-between"
+                                className="p-4 rounded-xl bg-stone-50 dark:bg-carbon-900 border border-stone-200 dark:border-carbon-700/60 flex flex-col justify-between"
                             >
                                 <div>
                                     <div className="flex items-center justify-between gap-2 mb-2">
-                                        <span className="px-2 py-0.5 rounded-full text-xs font-medium bg-emerald-950/70 text-emerald-300">
+                                        <span className="px-2 py-0.5 rounded-full text-xs font-medium bg-emerald-100 dark:bg-emerald-950/70 text-emerald-800 dark:text-emerald-300">
                                             {msg.collaboration_type}
                                         </span>
-                                        <span className="text-xs text-stone-400">
+                                        <span className="text-xs text-stone-500 dark:text-stone-400">
                                             {msg.region}
                                         </span>
                                     </div>
-                                    <div className="font-bold text-sm text-white">
+                                    <div className="font-bold text-sm text-stone-900 dark:text-white">
                                         {msg.name}
                                     </div>
-                                    <div className="text-xs text-emerald-400 mb-2">
+                                    <div className="text-xs text-emerald-700 dark:text-emerald-400 mb-2">
                                         {msg.organization}
                                     </div>
-                                    <p className="text-xs text-stone-300 leading-relaxed">
+                                    <p className="text-xs text-stone-600 dark:text-stone-300 leading-relaxed">
                                         "{msg.message}"
                                     </p>
                                 </div>
-                                <div className="mt-3 pt-2.5 border-t border-carbon-800 flex items-center gap-1.5 text-xs text-emerald-400">
+                                <div className="mt-3 pt-2.5 border-t border-stone-200 dark:border-carbon-800 flex items-center gap-1.5 text-xs text-emerald-700 dark:text-emerald-400">
                                     <CheckCircle2 className="w-3.5 h-3.5 shrink-0" />
                                     <span>{msg.status ? msg.status.replace(/\u2014/g, ':') : 'Terkirim: Diterima Koordinator'}</span>
                                 </div>

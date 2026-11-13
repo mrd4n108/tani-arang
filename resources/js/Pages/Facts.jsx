@@ -63,13 +63,13 @@ export default function Facts({ wasteFacts = [] }) {
             {/* Header & Direct CTA to Scanner */}
             <header className="mb-10 flex flex-col md:flex-row md:items-end justify-between gap-4">
                 <div>
-                    <span className="text-sm font-semibold text-emerald-400 block mb-2">
+                    <span className="text-sm font-semibold text-emerald-600 dark:text-emerald-400 block mb-2">
                         Pusat Edukasi Ilmiah & Panduan Lapangan Petani
                     </span>
-                    <h1 className="text-3xl sm:text-4xl font-extrabold text-white tracking-tight">
+                    <h1 className="text-3xl sm:text-4xl font-extrabold text-stone-900 dark:text-white tracking-tight">
                         Mengapa Limbah Panen Tidak Boleh Dibakar Terbuka?
                     </h1>
-                    <p className="text-stone-300 text-base mt-2 max-w-3xl leading-relaxed">
+                    <p className="text-stone-600 dark:text-stone-300 text-base mt-2 max-w-3xl leading-relaxed">
                         Perbandingan faktual berbasis riset agronomi dan sains iklim antara pembakaran terbuka tradisional vs konversi Arang Pertanian (Biochar).
                     </p>
                 </div>
@@ -85,47 +85,47 @@ export default function Facts({ wasteFacts = [] }) {
             </header>
 
             {/* 1. Ecological & Agronomical Comparison Matrix */}
-            <section className="bg-carbon-850 border border-carbon-700/60 rounded-2xl p-6 sm:p-8 mb-12">
+            <section className="bg-white dark:bg-carbon-850 border border-stone-200 dark:border-carbon-700/60 rounded-2xl p-6 sm:p-8 mb-12 shadow-sm transition-colors">
                 <div className="mb-6">
-                    <h2 className="text-xl font-bold text-white">
+                    <h2 className="text-xl font-bold text-stone-900 dark:text-white">
                         Dibakar Terbuka vs Diolah Menjadi Biochar
                     </h2>
-                    <p className="text-xs text-stone-400 mt-1">
+                    <p className="text-xs text-stone-500 dark:text-stone-400 mt-1">
                         Matriks perbandingan dampak ekologis dan agronomis berdasarkan rujukan Balittanah & IPCC
                     </p>
                 </div>
 
-                <div className="overflow-x-auto rounded-xl border border-carbon-700/60">
+                <div className="overflow-x-auto rounded-xl border border-stone-200 dark:border-carbon-700/60">
                     <table className="w-full text-left border-collapse">
                         <thead>
-                            <tr className="border-b border-carbon-700/60 bg-carbon-900 text-xs uppercase font-medium">
-                                <th className="py-4 px-4 text-stone-400 w-1/4">
+                            <tr className="border-b border-stone-200 dark:border-carbon-700/60 bg-stone-100 dark:bg-carbon-900 text-xs uppercase font-medium">
+                                <th className="py-4 px-4 text-stone-700 dark:text-stone-400 w-1/4">
                                     Parameter Dampak
                                 </th>
-                                <th className="py-4 px-4 text-amber-300 bg-amber-950/30 w-3/8">
+                                <th className="py-4 px-4 text-amber-800 bg-amber-50 dark:text-amber-300 dark:bg-amber-950/30 w-3/8">
                                     <div className="flex items-center gap-2">
-                                        <ShieldAlert className="w-4 h-4 text-amber-400 shrink-0" />
+                                        <ShieldAlert className="w-4 h-4 text-amber-600 dark:text-amber-400 shrink-0" />
                                         <span>Dibakar Terbuka di Lahan</span>
                                     </div>
                                 </th>
-                                <th className="py-4 px-4 text-emerald-300 bg-emerald-950/30 w-3/8">
+                                <th className="py-4 px-4 text-emerald-800 bg-emerald-50 dark:text-emerald-300 dark:bg-emerald-950/30 w-3/8">
                                     <div className="flex items-center gap-2">
-                                        <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
+                                        <CheckCircle2 className="w-4 h-4 text-emerald-600 dark:text-emerald-400 shrink-0" />
                                         <span>Diolah Menjadi Biochar</span>
                                     </div>
                                 </th>
                             </tr>
                         </thead>
-                        <tbody className="divide-y divide-carbon-800 text-xs sm:text-sm bg-carbon-900/60">
+                        <tbody className="divide-y divide-stone-200 dark:divide-carbon-800 text-xs sm:text-sm bg-white dark:bg-carbon-900/60">
                             {COMPARISON_MATRIX.map((row, idx) => (
-                                <tr key={idx} className="hover:bg-carbon-800/40 transition">
-                                    <td className="py-4 px-4 font-semibold text-white align-top">
+                                <tr key={idx} className="hover:bg-stone-50 dark:hover:bg-carbon-800/40 transition">
+                                    <td className="py-4 px-4 font-semibold text-stone-900 dark:text-white align-top">
                                         {row.aspect}
                                     </td>
-                                    <td className="py-4 px-4 text-stone-300 bg-amber-950/10 align-top leading-relaxed">
+                                    <td className="py-4 px-4 text-stone-700 bg-amber-50/40 dark:text-stone-300 dark:bg-amber-950/10 align-top leading-relaxed">
                                         {row.burned}
                                     </td>
-                                    <td className="py-4 px-4 text-emerald-100 bg-emerald-950/20 align-top leading-relaxed font-medium">
+                                    <td className="py-4 px-4 text-emerald-950 bg-emerald-50/40 dark:text-emerald-100 dark:bg-emerald-950/20 align-top leading-relaxed font-medium">
                                         {row.biochar}
                                     </td>
                                 </tr>
@@ -139,10 +139,10 @@ export default function Facts({ wasteFacts = [] }) {
             <section className="mb-12">
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
                     <div>
-                        <h2 className="text-xl font-bold text-white">
+                        <h2 className="text-xl font-bold text-stone-900 dark:text-white">
                             Katalog Biomassa & SOP Pengolahan
                         </h2>
-                        <p className="text-xs text-stone-400 mt-1">
+                        <p className="text-xs text-stone-500 dark:text-stone-400 mt-1">
                             Karakteristik 4 jenis limbah pertanian utama di Jawa Timur dan Sulawesi Barat
                         </p>
                     </div>
@@ -158,8 +158,8 @@ export default function Facts({ wasteFacts = [] }) {
                                     onClick={() => setSelectedRegionFilter(filter)}
                                     className={`min-h-[40px] px-4 py-1.5 rounded-xl text-xs font-semibold transition ${
                                         isActive
-                                            ? 'bg-emerald-600 text-white'
-                                            : 'bg-carbon-800 text-stone-300 hover:text-white hover:bg-carbon-700'
+                                            ? 'bg-emerald-600 text-white shadow-sm'
+                                            : 'bg-stone-100 dark:bg-carbon-800 text-stone-700 dark:text-stone-300 hover:text-stone-900 dark:hover:text-white hover:bg-stone-200 dark:hover:bg-carbon-700 border border-stone-200 dark:border-transparent'
                                     }`}
                                 >
                                     {filter}
@@ -170,20 +170,20 @@ export default function Facts({ wasteFacts = [] }) {
                 </div>
 
                 {filteredFacts.length === 0 ? (
-                    <div className="p-8 rounded-xl bg-carbon-850 border border-carbon-700/60 text-center flex flex-col items-center justify-center">
-                        <AlertTriangle className="w-10 h-10 text-amber-400 mb-2" />
-                        <div className="font-bold text-sm text-stone-200">
+                    <div className="p-8 rounded-xl bg-white dark:bg-carbon-850 border border-stone-200 dark:border-carbon-700/60 text-center flex flex-col items-center justify-center shadow-sm">
+                        <AlertTriangle className="w-10 h-10 text-amber-500 dark:text-amber-400 mb-2" />
+                        <div className="font-bold text-sm text-stone-900 dark:text-stone-200">
                             Tidak Ada Komoditas untuk Wilayah Ini
                         </div>
-                        <p className="text-xs text-stone-400 max-w-sm mt-1 mb-4">
+                        <p className="text-xs text-stone-600 dark:text-stone-400 max-w-sm mt-1 mb-4">
                             Silakan pilih filter wilayah lain untuk melihat katalog biomassa.
                         </p>
                         <button
                             type="button"
                             onClick={() => setSelectedRegionFilter('Semua')}
-                            className="min-h-[40px] inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-carbon-800 hover:bg-carbon-700 text-white text-xs font-semibold transition"
+                            className="min-h-[40px] inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-stone-100 dark:bg-carbon-800 hover:bg-stone-200 dark:hover:bg-carbon-700 text-stone-800 dark:text-white border border-stone-300 dark:border-carbon-700 text-xs font-semibold transition"
                         >
-                            <RotateCcw className="w-3.5 h-3.5 text-emerald-400" />
+                            <RotateCcw className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
                             <span>Tampilkan Semua Wilayah</span>
                         </button>
                     </div>
@@ -192,21 +192,21 @@ export default function Facts({ wasteFacts = [] }) {
                         {filteredFacts.map((fact) => (
                             <article
                                 key={fact.id}
-                                className="bg-carbon-850 border border-carbon-700/60 rounded-2xl p-6 sm:p-7 flex flex-col justify-between"
+                                className="bg-white dark:bg-carbon-850 border border-stone-200 dark:border-carbon-700/60 rounded-2xl p-6 sm:p-7 flex flex-col justify-between shadow-sm transition-colors"
                             >
                                 <div>
                                     {/* Top Card Header */}
                                     <div className="flex flex-wrap items-start justify-between gap-2 mb-4">
                                         <div>
-                                            <span className="inline-flex items-center gap-1.5 text-xs text-emerald-400 mb-1">
+                                            <span className="inline-flex items-center gap-1.5 text-xs text-emerald-700 dark:text-emerald-400 mb-1 font-medium">
                                                 <MapPin className="w-3.5 h-3.5 shrink-0" />
                                                 <span>Fokus Wilayah: {fact.region_focus}</span>
                                             </span>
-                                            <h3 className="font-bold text-xl text-white">
+                                            <h3 className="font-bold text-xl text-stone-900 dark:text-white">
                                                 {fact.waste_name}
                                             </h3>
                                         </div>
-                                        <span className="px-2.5 py-1 rounded-full text-xs bg-emerald-950/60 text-emerald-300 font-medium">
+                                        <span className="px-2.5 py-1 rounded-full text-xs bg-emerald-100 dark:bg-emerald-950/60 text-emerald-800 dark:text-emerald-300 font-medium">
                                             {fact.annual_volume_fact ? fact.annual_volume_fact.split('(')[0] : 'Potensi Signifikan'}
                                         </span>
                                     </div>
@@ -217,10 +217,10 @@ export default function Facts({ wasteFacts = [] }) {
                                             {Object.entries(fact.nutrient_facts).map(([k, v]) => (
                                                 <div
                                                     key={k}
-                                                    className="p-2.5 rounded-xl bg-carbon-900 border border-carbon-700/50"
+                                                    className="p-2.5 rounded-xl bg-stone-50 dark:bg-carbon-900 border border-stone-200 dark:border-carbon-700/50"
                                                 >
-                                                    <div className="text-[11px] text-stone-400 truncate">{k}</div>
-                                                    <div className="text-xs font-bold text-emerald-400 mt-0.5">
+                                                    <div className="text-[11px] text-stone-500 dark:text-stone-400 truncate">{k}</div>
+                                                    <div className="text-xs font-bold text-emerald-700 dark:text-emerald-400 mt-0.5">
                                                         {v}
                                                     </div>
                                                 </div>
@@ -230,22 +230,22 @@ export default function Facts({ wasteFacts = [] }) {
 
                                     {/* Hazard vs Benefit Comparison Boxes */}
                                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-5">
-                                        <div className="p-3.5 rounded-xl bg-amber-950/30 border border-amber-800/40">
-                                            <div className="text-xs font-bold text-amber-300 mb-1.5 flex items-center gap-1.5">
-                                                <Flame className="w-3.5 h-3.5 text-amber-400 shrink-0" />
+                                        <div className="p-3.5 rounded-xl bg-amber-50/80 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800/40">
+                                            <div className="text-xs font-bold text-amber-900 dark:text-amber-300 mb-1.5 flex items-center gap-1.5">
+                                                <Flame className="w-3.5 h-3.5 text-amber-600 dark:text-amber-400 shrink-0" />
                                                 <span>Dampak Negatif Dibakar:</span>
                                             </div>
-                                            <p className="text-xs text-stone-300 leading-relaxed">
+                                            <p className="text-xs text-stone-700 dark:text-stone-300 leading-relaxed">
                                                 {fact.burning_hazard_fact}
                                             </p>
                                         </div>
 
-                                        <div className="p-3.5 rounded-xl bg-emerald-950/30 border border-emerald-800/40">
-                                            <div className="text-xs font-bold text-emerald-300 mb-1.5 flex items-center gap-1.5">
-                                                <Sprout className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
+                                        <div className="p-3.5 rounded-xl bg-emerald-50/80 dark:bg-emerald-950/30 border border-emerald-200 dark:border-emerald-800/40">
+                                            <div className="text-xs font-bold text-emerald-900 dark:text-emerald-300 mb-1.5 flex items-center gap-1.5">
+                                                <Sprout className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400 shrink-0" />
                                                 <span>Manfaat Jadi Biochar:</span>
                                             </div>
-                                            <p className="text-xs text-stone-300 leading-relaxed">
+                                            <p className="text-xs text-stone-700 dark:text-stone-300 leading-relaxed">
                                                 {fact.biochar_benefit_fact}
                                             </p>
                                         </div>
@@ -253,16 +253,16 @@ export default function Facts({ wasteFacts = [] }) {
 
                                     {/* 3-Step Biochar Processing Guide */}
                                     <div className="space-y-2">
-                                        <div className="text-xs text-stone-300 flex items-center gap-1.5 font-semibold">
-                                            <Layers className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
+                                        <div className="text-xs text-stone-800 dark:text-stone-300 flex items-center gap-1.5 font-semibold">
+                                            <Layers className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400 shrink-0" />
                                             <span>Panduan 3 Langkah Pengolahan:</span>
                                         </div>
                                         {(fact.processing_steps || []).map((step, idx) => (
                                             <div
                                                 key={idx}
-                                                className="flex items-start gap-2.5 p-2.5 rounded-xl bg-carbon-900 border border-carbon-700/50 text-xs text-stone-200"
+                                                className="flex items-start gap-2.5 p-2.5 rounded-xl bg-stone-50 dark:bg-carbon-900 border border-stone-200 dark:border-carbon-700/50 text-xs text-stone-800 dark:text-stone-200"
                                             >
-                                                <span className="w-5 h-5 rounded-full bg-emerald-950 text-emerald-400 font-bold flex items-center justify-center shrink-0 text-xs">
+                                                <span className="w-5 h-5 rounded-full bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-400 font-bold flex items-center justify-center shrink-0 text-xs">
                                                     {idx + 1}
                                                 </span>
                                                 <span className="leading-relaxed">{step}</span>

@@ -38,11 +38,11 @@ import {
 const CustomCarbonTooltip = ({ active, payload, label }) => {
     if (active && payload && payload.length) {
         return (
-            <div className="bg-carbon-900 border border-carbon-700 rounded-xl p-3 text-xs shadow-xl text-stone-200">
-                <p className="font-bold text-stone-100 mb-1">{label}</p>
+            <div className="bg-white dark:bg-carbon-900 border border-stone-200 dark:border-carbon-700 rounded-xl p-3 text-xs shadow-xl text-stone-800 dark:text-stone-200">
+                <p className="font-bold text-stone-900 dark:text-stone-100 mb-1">{label}</p>
                 {payload.map((entry, idx) => (
                     <p key={idx} style={{ color: entry.color || '#22C55E' }}>
-                        {entry.name}: <span className="font-bold text-stone-100">{entry.value}</span>
+                        {entry.name}: <span className="font-bold text-stone-900 dark:text-stone-100">{entry.value}</span>
                     </p>
                 ))}
             </div>
@@ -103,32 +103,32 @@ export default function Dashboard({
             value: '6.2 Juta Ton',
             subtitle: 'Sentra Lamongan, Ngawi, Malang (BPS & Kementan RI)',
             icon: Sprout,
-            iconColor: 'text-emerald-400',
-            iconBg: 'bg-emerald-950/60',
+            iconColor: 'text-emerald-600 dark:text-emerald-400',
+            iconBg: 'bg-emerald-100 dark:bg-emerald-950/60',
         },
         {
             title: 'Rasio Residu Kulit Kakao Sulbar',
             value: '72.5% Panen',
             subtitle: 'Sentra Majene & Polewali Mandar: Rawan Jamur',
             icon: Flame,
-            iconColor: 'text-amber-400',
-            iconBg: 'bg-amber-950/60',
+            iconColor: 'text-amber-600 dark:text-amber-400',
+            iconBg: 'bg-amber-100 dark:bg-amber-950/60',
         },
         {
             title: 'Lahan Kritis C-Organik (<2%)',
             value: '~70% Sawah',
             subtitle: 'Dampak pemupukan kimia intensif & bakar jerami',
             icon: AlertTriangle,
-            iconColor: 'text-orange-400',
-            iconBg: 'bg-orange-950/60',
+            iconColor: 'text-orange-600 dark:text-orange-400',
+            iconBg: 'bg-orange-100 dark:bg-orange-950/60',
         },
         {
             title: 'Titik Data Komunitas',
             value: `${totalScansCount} Lokasi`,
             subtitle: 'Dokumentasi pemindaian Kelompok Tani terverifikasi',
             icon: Database,
-            iconColor: 'text-emerald-400',
-            iconBg: 'bg-emerald-950/60',
+            iconColor: 'text-emerald-600 dark:text-emerald-400',
+            iconBg: 'bg-emerald-100 dark:bg-emerald-950/60',
         },
     ];
 
@@ -139,18 +139,18 @@ export default function Dashboard({
             {/* 1. Hero Section */}
             <section className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start mb-12">
                 <div className="lg:col-span-7 space-y-5">
-                    <span className="text-sm font-semibold text-emerald-400 block tracking-wide">
+                    <span className="text-sm font-semibold text-emerald-600 dark:text-emerald-400 block tracking-wide">
                         Inisiatif Biochar Pertanian Indonesia
                     </span>
 
-                    <h1 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold tracking-tight text-white leading-tight">
+                    <h1 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold tracking-tight text-stone-900 dark:text-white leading-tight">
                         Hentikan Pembakaran Terbuka,{' '}
-                        <span className="text-emerald-400">
+                        <span className="text-emerald-600 dark:text-emerald-400">
                             Ubah Residu Panen Jadi Biochar Tani.
                         </span>
                     </h1>
 
-                    <p className="text-stone-300 text-base sm:text-lg leading-relaxed max-w-2xl">
+                    <p className="text-stone-600 dark:text-stone-300 text-base sm:text-lg leading-relaxed max-w-2xl">
                         Platform data faktual dan pemindai foto berbasis AI untuk mendampingi petani di Jawa Timur dan Sulawesi Barat menghentikan pembakaran terbuka dan mengonversi jerami, sekam, tongkol jagung, serta kulit kakao menjadi arang aktif penyubur tanah.
                     </p>
 
@@ -171,7 +171,7 @@ export default function Dashboard({
                             variant="secondary"
                             size="lg"
                         >
-                            <BookOpen className="w-4 h-4 text-emerald-400 mr-2" />
+                            <BookOpen className="w-4 h-4 text-emerald-600 dark:text-emerald-400 mr-2" />
                             Pelajari Fakta
                         </Button>
                         <Button
@@ -180,14 +180,14 @@ export default function Dashboard({
                             variant="outline"
                             size="lg"
                         >
-                            <MapPin className="w-4 h-4 text-stone-400 mr-2" />
+                            <MapPin className="w-4 h-4 text-stone-500 dark:text-stone-400 mr-2" />
                             Peta Sebaran
                         </Button>
                     </div>
 
-                    <div className="pt-2 flex items-center gap-6 text-xs text-stone-400">
+                    <div className="pt-2 flex items-center gap-6 text-xs text-stone-600 dark:text-stone-400">
                         <span className="flex items-center gap-1.5">
-                            <ShieldCheck className="w-4 h-4 text-emerald-400" />
+                            <ShieldCheck className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
                             Rujukan Balittanah & BPS RI
                         </span>
                         <span>Metode Pirolisis Bersih Kon-Tiki</span>
@@ -197,11 +197,11 @@ export default function Dashboard({
                 {/* 4 Commodities Grid */}
                 <div className="lg:col-span-5">
                     <Card className="p-6">
-                        <div className="mb-4 pb-3 border-b border-carbon-700/60">
-                            <h2 className="font-bold text-base text-white">
+                        <div className="mb-4 pb-3 border-b border-stone-200 dark:border-carbon-700/60">
+                            <h2 className="font-bold text-base text-stone-900 dark:text-white">
                                 Karakteristik 4 Komoditas Biochar
                             </h2>
-                            <p className="text-xs text-stone-400 mt-0.5">
+                            <p className="text-xs text-stone-500 dark:text-stone-400 mt-0.5">
                                 Potensi hara dan perbaikan struktur tanah per komoditas sentra
                             </p>
                         </div>
@@ -212,24 +212,24 @@ export default function Dashboard({
                                 return (
                                     <div
                                         key={idx}
-                                        className="p-3.5 rounded-xl bg-carbon-900 border border-carbon-700/60 flex flex-col justify-between space-y-2"
+                                        className="p-3.5 rounded-xl bg-stone-50 dark:bg-carbon-900 border border-stone-200 dark:border-carbon-700/60 flex flex-col justify-between space-y-2"
                                     >
                                         <div>
                                             <div className="flex items-center justify-between gap-1 mb-1.5">
                                                 <Badge variant={item.tagVariant} size="sm">
                                                     {item.tag}
                                                 </Badge>
-                                                <IconComponent className="w-4 h-4 text-stone-400" />
+                                                <IconComponent className="w-4 h-4 text-stone-500 dark:text-stone-400" />
                                             </div>
-                                            <h3 className="font-semibold text-sm text-stone-100">
+                                            <h3 className="font-semibold text-sm text-stone-900 dark:text-stone-100">
                                                 {item.name}
                                             </h3>
-                                            <p className="text-xs text-emerald-400 mt-0.5">
+                                            <p className="text-xs text-emerald-700 dark:text-emerald-400 mt-0.5 font-medium">
                                                 {item.nutrient}
                                             </p>
                                         </div>
 
-                                        <div className="pt-2 border-t border-carbon-800 text-xs text-stone-400 leading-snug">
+                                        <div className="pt-2 border-t border-stone-200 dark:border-carbon-800 text-xs text-stone-600 dark:text-stone-400 leading-snug">
                                             <p>{item.role}</p>
                                             <p className="mt-1 text-[11px] text-stone-500">
                                                 Sentra: {item.region}
@@ -263,10 +263,10 @@ export default function Dashboard({
                 {/* Bar Chart: Regional Waste Generation vs Biochar Conversion */}
                 <Card className="lg:col-span-7 p-6">
                     <div className="mb-5">
-                        <h3 className="font-bold text-lg text-white">
+                        <h3 className="font-bold text-lg text-stone-900 dark:text-white">
                             Timbulan Residu Panen vs Potensi Biochar
                         </h3>
-                        <p className="text-xs text-stone-400 mt-0.5">
+                        <p className="text-xs text-stone-500 dark:text-stone-400 mt-0.5">
                             Data estimasi regional per kabupaten sentra (dalam Ribu Ton/Tahun)
                         </p>
                     </div>
@@ -274,13 +274,13 @@ export default function Dashboard({
                     <div className="h-72 w-full">
                         <ResponsiveContainer width="100%" height="100%">
                             <BarChart data={regionalComparison} margin={{ top: 10, right: 10, left: -15, bottom: 0 }}>
-                                <CartesianGrid stroke="#232E29" strokeDasharray="3 3" vertical={false} />
-                                <XAxis dataKey="region" fontSize={12} stroke="#8B9B92" tickLine={false} />
-                                <YAxis fontSize={12} stroke="#8B9B92" tickLine={false} />
+                                <CartesianGrid stroke="currentColor" className="text-stone-200 dark:text-carbon-700/60" strokeDasharray="3 3" vertical={false} />
+                                <XAxis dataKey="region" fontSize={12} stroke="#78716C" tickLine={false} />
+                                <YAxis fontSize={12} stroke="#78716C" tickLine={false} />
                                 <Tooltip content={<CustomCarbonTooltip />} />
                                 <Legend
                                     wrapperStyle={{ fontSize: '12px', paddingTop: '10px' }}
-                                    formatter={(value) => <span className="text-stone-300">{value}</span>}
+                                    formatter={(value) => <span className="text-stone-700 dark:text-stone-300 font-medium">{value}</span>}
                                 />
                                 <Bar
                                     dataKey="timbulan_ribu_ton"
@@ -303,10 +303,10 @@ export default function Dashboard({
                 <Card className="lg:col-span-5 p-6 flex flex-col justify-between">
                     <div>
                         <div className="mb-4">
-                            <h3 className="font-bold text-lg text-white">
+                            <h3 className="font-bold text-lg text-stone-900 dark:text-white">
                                 Proporsi Jenis Residu Terdata
                             </h3>
-                            <p className="text-xs text-stone-400 mt-0.5">
+                            <p className="text-xs text-stone-500 dark:text-stone-400 mt-0.5">
                                 Sebaran komoditas limbah yang teridentifikasi di lapangan
                             </p>
                         </div>
@@ -340,16 +340,16 @@ export default function Dashboard({
                         {wasteDistribution.map((item, idx) => (
                             <div
                                 key={idx}
-                                className="flex items-center justify-between px-3 py-2 rounded-xl bg-carbon-900 border border-carbon-700/60 text-xs"
+                                className="flex items-center justify-between px-3 py-2 rounded-xl bg-stone-50 dark:bg-carbon-900 border border-stone-200 dark:border-carbon-700/60 text-xs"
                             >
-                                <span className="flex items-center gap-2 text-stone-300 truncate mr-1">
+                                <span className="flex items-center gap-2 text-stone-700 dark:text-stone-300 truncate mr-1">
                                     <span
                                         className="w-2.5 h-2.5 rounded-full shrink-0"
                                         style={{ backgroundColor: item.color }}
                                     />
                                     <span className="truncate">{item.name}</span>
                                 </span>
-                                <span className="font-semibold text-white shrink-0">
+                                <span className="font-semibold text-stone-900 dark:text-white shrink-0">
                                     {item.value} log
                                 </span>
                             </div>
@@ -363,10 +363,10 @@ export default function Dashboard({
                 {/* Area Chart: Open Burning Reduction vs Biochar Adoption */}
                 <Card className="lg:col-span-7 p-6">
                     <div className="mb-4">
-                        <h3 className="font-bold text-lg text-white">
+                        <h3 className="font-bold text-lg text-stone-900 dark:text-white">
                             Tren Penurunan Lahan Pembakaran Terbuka
                         </h3>
-                        <p className="text-xs text-stone-400 mt-0.5">
+                        <p className="text-xs text-stone-500 dark:text-stone-400 mt-0.5">
                             Luas lahan terdampak program substitusi biochar (Hektar)
                         </p>
                     </div>
@@ -384,13 +384,13 @@ export default function Dashboard({
                                         <stop offset="95%" stopColor="#F97316" stopOpacity={0.0} />
                                     </linearGradient>
                                 </defs>
-                                <CartesianGrid stroke="#232E29" strokeDasharray="3 3" vertical={false} />
-                                <XAxis dataKey="bulan" fontSize={12} stroke="#8B9B92" tickLine={false} />
-                                <YAxis fontSize={12} stroke="#8B9B92" tickLine={false} />
+                                <CartesianGrid stroke="currentColor" className="text-stone-200 dark:text-carbon-700/60" strokeDasharray="3 3" vertical={false} />
+                                <XAxis dataKey="bulan" fontSize={12} stroke="#78716C" tickLine={false} />
+                                <YAxis fontSize={12} stroke="#78716C" tickLine={false} />
                                 <Tooltip content={<CustomCarbonTooltip />} />
                                 <Legend
                                     wrapperStyle={{ fontSize: '12px', paddingTop: '10px' }}
-                                    formatter={(value) => <span className="text-stone-300">{value}</span>}
+                                    formatter={(value) => <span className="text-stone-700 dark:text-stone-300 font-medium">{value}</span>}
                                 />
                                 <Area
                                     type="monotone"
@@ -420,16 +420,16 @@ export default function Dashboard({
                     <div>
                         <div className="flex items-center justify-between mb-4">
                             <div>
-                                <h3 className="font-bold text-lg text-white">
+                                <h3 className="font-bold text-lg text-stone-900 dark:text-white">
                                     Dokumentasi Lapangan Terakhir
                                 </h3>
-                                <p className="text-xs text-stone-400 mt-0.5">
+                                <p className="text-xs text-stone-500 dark:text-stone-400 mt-0.5">
                                     Log verifikasi kelompok tani mitra
                                 </p>
                             </div>
                             <Link
                                 href="/community-map"
-                                className="text-xs font-semibold text-emerald-400 hover:text-emerald-300 flex items-center gap-1"
+                                className="text-xs font-semibold text-emerald-600 dark:text-emerald-400 hover:text-emerald-700 dark:hover:text-emerald-300 flex items-center gap-1"
                             >
                                 Peta Lengkap <ArrowUpRight className="w-3.5 h-3.5" />
                             </Link>
@@ -440,21 +440,21 @@ export default function Dashboard({
                                 {recentScans.map((scan) => (
                                     <div
                                         key={scan.id}
-                                        className="p-3 rounded-xl bg-carbon-900 border border-carbon-700/60 flex items-start justify-between gap-3"
+                                        className="p-3 rounded-xl bg-stone-50 dark:bg-carbon-900 border border-stone-200 dark:border-carbon-700/60 flex items-start justify-between gap-3"
                                     >
                                         <div className="min-w-0">
-                                            <div className="font-semibold text-sm text-stone-100 flex items-center gap-1.5 truncate">
-                                                <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
+                                            <div className="font-semibold text-sm text-stone-900 dark:text-stone-100 flex items-center gap-1.5 truncate">
+                                                <CheckCircle2 className="w-4 h-4 text-emerald-600 dark:text-emerald-400 shrink-0" />
                                                 <span className="truncate">{scan.farmer_group_name}</span>
                                             </div>
-                                            <div className="text-xs text-stone-400 flex items-center gap-1.5 mt-1">
-                                                <MapPin className="w-3.5 h-3.5 text-stone-500 shrink-0" />
+                                            <div className="text-xs text-stone-600 dark:text-stone-400 flex items-center gap-1.5 mt-1">
+                                                <MapPin className="w-3.5 h-3.5 text-stone-400 dark:text-stone-500 shrink-0" />
                                                 <span className="truncate">
                                                     {scan.regency} • {scan.detected_waste_type}
                                                 </span>
                                             </div>
                                             {scan.moisture_condition && (
-                                                <span className="inline-block mt-1 text-xs text-stone-400">
+                                                <span className="inline-block mt-1 text-xs text-stone-500 dark:text-stone-400">
                                                     Kondisi: {scan.moisture_condition}
                                                 </span>
                                             )}
@@ -466,22 +466,22 @@ export default function Dashboard({
                                 ))}
                             </div>
                         ) : (
-                            <div className="py-8 px-4 rounded-xl bg-carbon-900 border border-carbon-700/60 text-center space-y-3">
-                                <div className="w-10 h-10 rounded-full bg-carbon-800 mx-auto flex items-center justify-center text-stone-400">
+                            <div className="py-8 px-4 rounded-xl bg-stone-50 dark:bg-carbon-900 border border-stone-200 dark:border-carbon-700/60 text-center space-y-3">
+                                <div className="w-10 h-10 rounded-full bg-stone-100 dark:bg-carbon-800 mx-auto flex items-center justify-center text-stone-400">
                                     <Camera className="w-5 h-5" />
                                 </div>
-                                <p className="text-sm font-medium text-stone-300">
+                                <p className="text-sm font-medium text-stone-700 dark:text-stone-300">
                                     Belum ada data dokumentasi
                                 </p>
                             </div>
                         )}
                     </div>
 
-                    <div className="mt-4 pt-3 border-t border-carbon-700/60 flex items-center justify-between text-xs text-stone-400">
+                    <div className="mt-4 pt-3 border-t border-stone-200 dark:border-carbon-700/60 flex items-center justify-between text-xs text-stone-600 dark:text-stone-400">
                         <span>Punya foto tumpukan limbah panen?</span>
                         <Link
                             href="/scanner"
-                            className="text-emerald-400 font-semibold hover:text-emerald-300"
+                            className="text-emerald-600 dark:text-emerald-400 font-semibold hover:text-emerald-700 dark:hover:text-emerald-300"
                         >
                             Uji di Pemindai
                         </Link>
