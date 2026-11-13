@@ -155,9 +155,9 @@ export default function Scanner({ presets = {} }) {
                 scrollWheelZoom: true,
             });
 
-            L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
-                attribution: '&copy; OpenStreetMap &copy; CARTO',
-                maxZoom: 18,
+            L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '&copy; OpenStreetMap contributors',
+                maxZoom: 19,
             }).addTo(map);
 
             const marker = L.circleMarker([coords.lat, coords.lng], {
