@@ -332,9 +332,8 @@ export default function CommunityMap({
         }
 
         const isDarkInitial = document.documentElement.classList.contains('dark');
-        const darkTile = 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png';
-        const lightTile = 'https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png';
-
+        const darkTile = 'https://tile.openstreetmap.org/{z}/{x}/{y}.png';
+        const lightTile = 'https://tile.openstreetmap.org/{z}/{x}/{y}.png';
         const map = L.map(mapContainerRef.current, {
             center: CLUSTER_VIEWS.all.center,
             zoom: CLUSTER_VIEWS.all.zoom,
