@@ -3,12 +3,16 @@
 namespace App\Http\Controllers;
 
 use App\Models\ContactMessage;
+use App\Models\SubmissionNotification;
+use App\Models\User;
 use App\Models\WasteFact;
 use App\Models\WasteScan;
+use App\Models\WasteSubmission;
 use App\Services\WasteVisionService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
+use Illuminate\Validation\Rule;
 use Inertia\Inertia;
 
 class TaniArangController extends Controller
@@ -59,9 +63,33 @@ class TaniArangController extends Controller
 
     public function scanner(WasteVisionService $visionService)
     {
+        $userId = auth()->id();
+        $scans = $userId ? WasteScan::where('user_id', $userId)->latest()->get() : collect();
+        $submissions = $userId ? WasteSubmission::where('user_id', $userId)->with('community')->latest()->get() : collect();
+        $communities = User::where('role', 'komunitas')->select('id', 'name', 'region', 'community_address', 'phone')->get();
+
         return Inertia::render('Scanner', [
             'presets' => $visionService->getDeterministicPresets(),
             'recentScansCount' => WasteScan::count(),
+            'scans' => $scans,
+            'submissions' => $submissions,
+            'communities' => $communities,
+        ]);
+    }
+
+    public function petaniHistory(WasteVisionService $visionService)
+    {
+        $userId = auth()->id();
+        $scans = WasteScan::where('user_id', $userId)->latest()->get();
+        $submissions = WasteSubmission::where('user_id', $userId)->with('community')->latest()->get();
+        $communities = User::where('role', 'komunitas')->select('id', 'name', 'region', 'community_address', 'phone')->get();
+
+        return Inertia::render('Scanner', [
+            'presets' => $visionService->getDeterministicPresets(),
+            'recentScansCount' => WasteScan::count(),
+            'scans' => $scans,
+            'submissions' => $submissions,
+            'communities' => $communities,
         ]);
     }
 
@@ -85,6 +113,10 @@ class TaniArangController extends Controller
 
     public function storeScan(Request $request)
     {
+        if (! auth()->check()) {
+            return redirect()->route('login');
+        }
+
         $validated = $request->validate([
             'farmer_group_name' => 'required|string|max:140',
             'village_location' => 'required|string|max:160',
@@ -98,11 +130,24 @@ class TaniArangController extends Controller
             'ai_summary_recommendation' => 'required|string',
             'ai_next_steps' => 'required|array|min:1',
             'processing_status' => 'nullable|in:Belum diolah,Diproses,Selesai',
+            'destination_mode' => 'nullable|in:mandiri,komunitas',
+            'community_id' => [
+                'nullable',
+                'required_if:destination_mode,komunitas',
+                Rule::exists('users', 'id')->where(function ($query) {
+                    $query->where('role', 'komunitas');
+                }),
+            ],
+            'estimated_weight_kg' => 'nullable|numeric|min:0',
+            'notes' => 'nullable|string|max:1000',
         ]);
 
         $imagePath = '/demo/community-verified.webp';
 
-        if (!empty($validated['image_base64']) && preg_match('/^data:image\/(\w+);base64,/', $validated['image_base64'], $matches)) {
+        if ($request->hasFile('image')) {
+            $path = $request->file('image')->store('scans', 'public');
+            $imagePath = '/storage/' . $path;
+        } elseif (!empty($validated['image_base64']) && preg_match('/^data:image\/(\w+);base64,/', $validated['image_base64'], $matches)) {
             $extension = strtolower($matches[1]) === 'jpeg' ? 'jpg' : strtolower($matches[1]);
             $rawData = substr($validated['image_base64'], strpos($validated['image_base64'], ',') + 1);
             $decoded = base64_decode($rawData, true);
@@ -114,23 +159,155 @@ class TaniArangController extends Controller
             }
         }
 
-        unset($validated['image_base64']);
-        $validated['image_path'] = $imagePath;
-        $validated['processing_status'] = $validated['processing_status'] ?? 'Belum diolah';
+        $destinationMode = $validated['destination_mode'] ?? 'mandiri';
 
-        WasteScan::create($validated);
+        $scan = WasteScan::create([
+            'user_id' => auth()->id(),
+            'farmer_group_name' => $validated['farmer_group_name'],
+            'village_location' => $validated['village_location'],
+            'regency' => $validated['regency'],
+            'latitude' => $validated['latitude'],
+            'longitude' => $validated['longitude'],
+            'image_path' => $imagePath,
+            'detected_waste_type' => $validated['detected_waste_type'],
+            'moisture_condition' => $validated['moisture_condition'],
+            'ai_confidence' => $validated['ai_confidence'],
+            'ai_summary_recommendation' => $validated['ai_summary_recommendation'],
+            'ai_next_steps' => $validated['ai_next_steps'],
+            'processing_status' => $validated['processing_status'] ?? 'Belum diolah',
+            'destination_mode' => $destinationMode,
+        ]);
+
+        if ($destinationMode === 'komunitas') {
+            $trackingCode = 'TRK-' . now()->format('Ymd') . '-' . strtoupper(Str::random(5));
+
+            $submission = WasteSubmission::create([
+                'tracking_code' => $trackingCode,
+                'user_id' => auth()->id(),
+                'community_id' => $validated['community_id'],
+                'scan_id' => $scan->id,
+                'waste_type' => $validated['detected_waste_type'],
+                'estimated_weight_kg' => $request->input('estimated_weight_kg'),
+                'moisture_condition' => $validated['moisture_condition'],
+                'destination_mode' => 'komunitas',
+                'status' => 'Menanti',
+                'notes' => $request->input('notes'),
+                'photo_path' => $imagePath,
+            ]);
+
+            $senderName = auth()->user()->name ?? $validated['farmer_group_name'];
+            SubmissionNotification::create([
+                'user_id' => $validated['community_id'],
+                'submission_id' => $submission->id,
+                'type' => 'new_submission',
+                'title' => 'Setoran Limbah Baru dari ' . $senderName,
+                'message' => 'Setoran ' . $validated['detected_waste_type'] . ' seberat ' . ($request->input('estimated_weight_kg') ?? 0) . ' kg telah terkirim dan menanti konfirmasi Anda.',
+                'is_read' => false,
+            ]);
+
+            return redirect()
+                ->route('community-map')
+                ->with('success', "Setoran biomassa berhasil dikirim dengan kode #{$trackingCode}. Sentra komunitas telah dinotifikasi.");
+        }
 
         return redirect()
             ->route('community-map')
             ->with('success', 'Dokumentasi pemindaian AI berhasil disimpan ke Peta dan Log Kelompok Tani.');
     }
 
-    public function communityMap()
+    public function communityMap(Request $request)
     {
+        $user = auth()->user();
+        $submissionsQuery = WasteSubmission::with(['user', 'community', 'farmer']);
+
+        if ($user && $user->role === 'komunitas') {
+            $submissionsQuery->where('community_id', $user->id);
+        } elseif ($user && $user->role === 'petani') {
+            $submissionsQuery->where('user_id', $user->id);
+        } else {
+            $submissionsQuery->whereRaw('1 = 0');
+        }
+
+        if ($request->filled('status')) {
+            $submissionsQuery->where('status', $request->input('status'));
+        }
+
+        if ($request->filled('date_from')) {
+            $submissionsQuery->whereDate('created_at', '>=', $request->input('date_from'));
+        }
+
+        if ($request->filled('date_to')) {
+            $submissionsQuery->whereDate('created_at', '<=', $request->input('date_to'));
+        }
+
+        $submissions = $submissionsQuery->latest()->get();
+
+        $unreadNotificationsCount = 0;
+        if ($user) {
+            $unreadNotificationsCount = SubmissionNotification::where('user_id', $user->id)
+                ->where('is_read', false)
+                ->count();
+        }
+
         return Inertia::render('CommunityMap', [
             'scans' => WasteScan::latest()->get(),
             'trashedScans' => WasteScan::onlyTrashed()->latest()->take(20)->get(),
+            'submissions' => $submissions,
+            'unread_notifications_count' => $unreadNotificationsCount,
+            'filters' => $request->only(['status', 'date_from', 'date_to']),
+            'communities' => User::where('role', 'komunitas')->get(['id', 'name', 'region', 'community_address', 'phone']),
         ]);
+    }
+
+    public function updateSubmissionStatus(Request $request, $id)
+    {
+        $submission = WasteSubmission::findOrFail($id);
+
+        if ($submission->community_id !== auth()->id()) {
+            abort(403, 'Akses ditolak: Anda tidak memiliki wewenang atas setoran komunitas ini.');
+        }
+
+        $validated = $request->validate([
+            'status' => 'required|in:Menanti,Diterima,Sedang Diolah,Selesai',
+        ]);
+
+        $submission->update([
+            'status' => $validated['status'],
+        ]);
+
+        SubmissionNotification::where('submission_id', $submission->id)
+            ->where('user_id', auth()->id())
+            ->update(['is_read' => true]);
+
+        return back()->with('success', "Status setoran #{$submission->tracking_code} berhasil diperbarui menjadi {$validated['status']}.");
+    }
+
+    public function verifySubmission(Request $request, $id)
+    {
+        $submission = WasteSubmission::findOrFail($id);
+
+        if ($submission->community_id !== auth()->id()) {
+            abort(403, 'Akses ditolak: Anda tidak memiliki wewenang atas setoran komunitas ini.');
+        }
+
+        $validated = $request->validate([
+            'verification_photo' => 'nullable|file|image|max:10240',
+            'verification_notes' => 'nullable|string|max:1000',
+        ]);
+
+        if ($request->hasFile('verification_photo')) {
+            $path = $request->file('verification_photo')->store('verifications', 'public');
+            $submission->verification_photo_path = '/storage/' . $path;
+        }
+
+        if ($request->filled('verification_notes')) {
+            $submission->verification_notes = $validated['verification_notes'];
+        }
+
+        $submission->verified_at = now();
+        $submission->save();
+
+        return back()->with('success', "Verifikasi setoran #{$submission->tracking_code} berhasil diperbarui.");
     }
 
     public function updateScanStatus(Request $request, WasteScan $scan)

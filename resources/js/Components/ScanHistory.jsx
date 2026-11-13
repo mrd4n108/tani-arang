@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
+import { Link } from '@inertiajs/react';
 import {
     Clock,
     Flame,
@@ -6,119 +7,112 @@ import {
     Calendar,
     MapPin,
     Phone,
-    Trash2,
-    ChevronDown,
-    ChevronUp,
     Camera,
-    Sparkles,
     CheckCircle2,
     Layers,
     Leaf,
-    ShieldAlert,
+    LogIn,
+    ChevronDown,
+    ChevronUp,
+    Check,
 } from 'lucide-react';
-import {
-    getScanHistory,
-    deleteScanRecord,
-    clearScanHistory,
-    seedDemoScanHistory,
-} from '@/Utils/scanHistoryStorage';
 import Badge from '@/Components/Badge';
 
-export default function ScanHistory({ onSwitchToScanner }) {
-    const [records, setRecords] = useState([]);
-    const [isLoading, setIsLoading] = useState(true);
-    const [filter, setFilter] = useState('semua'); // 'semua' | 'komunitas' | 'mandiri'
-    const [expandedCardId, setExpandedCardId] = useState(null);
-    const [showConfirmClear, setShowConfirmClear] = useState(false);
-
-    const loadRecords = () => {
-        const data = getScanHistory();
-        setRecords(data);
-        setIsLoading(false);
-    };
-
-    useEffect(() => {
-        loadRecords();
-    }, []);
-
-    const handleDelete = (id) => {
-        const updated = deleteScanRecord(id);
-        setRecords(updated);
-    };
-
-    const handleClearAll = () => {
-        clearScanHistory();
-        setRecords([]);
-        setShowConfirmClear(false);
-    };
-
-    const handleSeedDemo = () => {
-        const seeded = seedDemoScanHistory();
-        setRecords(seeded);
-    };
-
-    const filteredRecords = records.filter((rec) => {
-        if (filter === 'semua') return true;
-        if (filter === 'komunitas') return rec.destination === 'komunitas';
-        if (filter === 'mandiri') return rec.destination === 'mandiri';
-        return true;
-    });
-
-    if (isLoading) {
-        return (
-            <div className="space-y-4 py-8">
-                {[1, 2, 3].map((n) => (
-                    <div
-                        key={n}
-                        className="p-6 rounded-2xl bg-white dark:bg-carbon-850 border border-stone-200 dark:border-carbon-700/60 animate-pulse h-40"
-                    />
-                ))}
-            </div>
-        );
+function formatDate(dateString) {
+    if (!dateString) return '-';
+    try {
+        const d = new Date(dateString);
+        return d.toLocaleDateString('id-ID', {
+            day: 'numeric',
+            month: 'short',
+            year: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit',
+        });
+    } catch {
+        return dateString;
     }
+}
 
-    if (records.length === 0) {
+function getStatusBadge(status) {
+    switch (status) {
+        case 'Selesai':
+            return {
+                bg: 'bg-emerald-100 text-emerald-800 dark:bg-emerald-950/70 dark:text-emerald-300 border-emerald-300 dark:border-emerald-800',
+                icon: Check,
+            };
+        case 'Sedang Diolah':
+            return {
+                bg: 'bg-orange-100 text-orange-800 dark:bg-orange-950/70 dark:text-orange-300 border-orange-300 dark:border-orange-800',
+                icon: Flame,
+            };
+        case 'Diterima':
+            return {
+                bg: 'bg-sky-100 text-sky-800 dark:bg-sky-950/70 dark:text-sky-300 border-sky-300 dark:border-sky-800',
+                icon: CheckCircle2,
+            };
+        default:
+            return {
+                bg: 'bg-amber-100 text-amber-800 dark:bg-amber-950/70 dark:text-amber-300 border-amber-300 dark:border-amber-800',
+                icon: Clock,
+            };
+    }
+}
+
+export default function ScanHistory({
+    scans = [],
+    submissions = [],
+    onSwitchToScanner,
+    isGuest = false,
+}) {
+    const [filter, setFilter] = useState('semua'); // 'semua' | 'komunitas' | 'mandiri'
+    const [expandedScanId, setExpandedScanId] = useState(null);
+
+    // Guest Mode Banner
+    if (isGuest) {
         return (
-            <div className="rounded-2xl border border-stone-200 dark:border-carbon-700/60 bg-white dark:bg-carbon-850 p-8 sm:p-12 text-center transition-colors">
-                <div className="w-16 h-16 rounded-2xl bg-emerald-50 dark:bg-carbon-800 text-emerald-600 dark:text-emerald-400 mx-auto flex items-center justify-center mb-4 border border-emerald-100 dark:border-carbon-700">
+            <div className="rounded-2xl border border-stone-200 dark:border-carbon-700/60 bg-white dark:bg-carbon-850 p-8 sm:p-12 text-center transition-colors shadow-sm">
+                <div className="w-16 h-16 rounded-2xl bg-amber-50 dark:bg-carbon-800 text-amber-600 dark:text-amber-400 mx-auto flex items-center justify-center mb-4 border border-amber-200 dark:border-carbon-700">
                     <Clock className="w-8 h-8" />
                 </div>
                 <h3 className="text-lg sm:text-xl font-bold text-stone-900 dark:text-white tracking-tight">
-                    Belum Ada Riwayat Pindai
+                    Riwayat Tersedia untuk Pengguna Terdaftar
                 </h3>
                 <p className="max-w-md mx-auto text-xs sm:text-sm text-stone-600 dark:text-stone-400 mt-2 leading-relaxed">
-                    Setiap pemindaian limbah biomassa dan pemilihan alur (Setor ke Komunitas atau Olah Mandiri Kon-Tiki) akan otomatis tersimpan di sini.
+                    Saat ini Anda mengakses dalam Mode Tamu. Seluruh riwayat pemindaian dan pelacakan status setoran limbah hanya dicatat secara permanen untuk akun Petani terdaftar.
                 </p>
-
                 <div className="mt-6 flex flex-col sm:flex-row items-center justify-center gap-3">
+                    <Link
+                        href={route('login')}
+                        className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl text-sm font-semibold bg-emerald-600 hover:bg-emerald-500 text-white min-h-[44px] transition shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500"
+                    >
+                        <LogIn className="w-4 h-4" />
+                        <span>Masuk sebagai Petani</span>
+                    </Link>
                     <button
                         type="button"
                         onClick={onSwitchToScanner}
-                        className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl text-sm font-semibold bg-emerald-600 hover:bg-emerald-500 text-white min-h-[44px] transition shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500"
+                        className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl text-sm font-semibold border border-stone-300 dark:border-carbon-700 bg-stone-50 dark:bg-carbon-800 text-stone-700 dark:text-stone-200 hover:bg-stone-100 min-h-[44px] transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500"
                     >
                         <Camera className="w-4 h-4" />
-                        <span>Mulai Pemindaian Sekarang</span>
-                    </button>
-
-                    <button
-                        type="button"
-                        onClick={handleSeedDemo}
-                        className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl text-sm font-semibold border border-stone-300 dark:border-carbon-700 bg-stone-50 dark:bg-carbon-800 text-stone-700 dark:text-stone-200 hover:bg-stone-100 dark:hover:bg-carbon-700 min-h-[44px] transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500"
-                    >
-                        <Sparkles className="w-4 h-4 text-amber-500" />
-                        <span>Muat Contoh Sampel Riwayat</span>
+                        <span>Coba Pemindai Biomassa</span>
                     </button>
                 </div>
             </div>
         );
     }
 
+    const mandiriScans = scans.filter((s) => s.destination_mode === 'mandiri');
+    const totalCount = submissions.length + mandiriScans.length;
+
+    const showSubmissions = filter === 'semua' || filter === 'komunitas';
+    const showMandiri = filter === 'semua' || filter === 'mandiri';
+
     return (
         <div className="space-y-6">
-            {/* Filter and Summary Bar */}
+            {/* Filter Pills Toolbar */}
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-4 rounded-2xl bg-white dark:bg-carbon-850 border border-stone-200 dark:border-carbon-700/60 shadow-sm transition-colors">
-                {/* Filter Pills */}
-                <div className="flex flex-wrap items-center gap-2" role="tablist" aria-label="Filter Riwayat Pindai">
+                <div className="flex flex-wrap items-center gap-2" role="tablist" aria-label="Filter Riwayat Aktivitas">
                     <button
                         type="button"
                         role="tab"
@@ -130,7 +124,7 @@ export default function ScanHistory({ onSwitchToScanner }) {
                                 : 'bg-stone-100 dark:bg-carbon-800 text-stone-700 dark:text-stone-300 hover:bg-stone-200 dark:hover:bg-carbon-700'
                         }`}
                     >
-                        Semua ({records.length})
+                        Semua ({totalCount})
                     </button>
 
                     <button
@@ -145,7 +139,7 @@ export default function ScanHistory({ onSwitchToScanner }) {
                         }`}
                     >
                         <Building2 className="w-3.5 h-3.5" />
-                        <span>Setor Komunitas ({records.filter((r) => r.destination === 'komunitas').length})</span>
+                        <span>Setor ke Komunitas ({submissions.length})</span>
                     </button>
 
                     <button
@@ -160,188 +154,217 @@ export default function ScanHistory({ onSwitchToScanner }) {
                         }`}
                     >
                         <Flame className="w-3.5 h-3.5" />
-                        <span>Olah Mandiri ({records.filter((r) => r.destination === 'mandiri').length})</span>
+                        <span>Olah Mandiri ({mandiriScans.length})</span>
                     </button>
                 </div>
 
-                {/* Clear & Add More Actions */}
-                <div className="flex items-center gap-2 self-end sm:self-auto">
-                    {showConfirmClear ? (
-                        <div className="flex items-center gap-2 bg-rose-50 dark:bg-rose-950/60 p-1.5 rounded-xl border border-rose-300 dark:border-rose-800">
-                            <span className="text-xs text-rose-800 dark:text-rose-200 font-medium px-2">Hapus semua?</span>
-                            <button
-                                type="button"
-                                onClick={handleClearAll}
-                                className="px-3 py-1.5 rounded-lg text-xs font-bold bg-rose-600 text-white hover:bg-rose-700 min-h-[36px]"
-                            >
-                                Ya, Bersihkan
-                            </button>
-                            <button
-                                type="button"
-                                onClick={() => setShowConfirmClear(false)}
-                                className="px-3 py-1.5 rounded-lg text-xs font-semibold bg-stone-200 dark:bg-carbon-700 text-stone-700 dark:text-stone-200 min-h-[36px]"
-                            >
-                                Batal
-                            </button>
-                        </div>
-                    ) : (
-                        <button
-                            type="button"
-                            onClick={() => setShowConfirmClear(true)}
-                            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-medium text-stone-600 dark:text-stone-400 hover:text-rose-600 dark:hover:text-rose-400 border border-stone-200 dark:border-carbon-700 hover:border-rose-300 dark:hover:border-rose-800 min-h-[44px] transition"
-                            title="Bersihkan semua riwayat penyimpanan lokal"
-                        >
-                            <Trash2 className="w-3.5 h-3.5" />
-                            <span>Bersihkan Riwayat</span>
-                        </button>
-                    )}
-                </div>
+                <button
+                    type="button"
+                    onClick={onSwitchToScanner}
+                    className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-semibold bg-stone-100 dark:bg-carbon-800 hover:bg-stone-200 dark:hover:bg-carbon-700 text-stone-800 dark:text-white min-h-[44px] transition self-end sm:self-auto"
+                >
+                    <Camera className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
+                    <span>Pindai Limbah Baru</span>
+                </button>
             </div>
 
-            {/* List of History Records */}
-            {filteredRecords.length === 0 ? (
-                <div className="p-8 text-center rounded-2xl bg-white dark:bg-carbon-850 border border-stone-200 dark:border-carbon-700/60 text-stone-500 dark:text-stone-400 text-sm">
-                    Tidak ada rekaman untuk filter terpilih.
+            {/* Empty State */}
+            {totalCount === 0 && (
+                <div className="rounded-2xl border border-stone-200 dark:border-carbon-700/60 bg-white dark:bg-carbon-850 p-8 sm:p-12 text-center transition-colors shadow-sm">
+                    <div className="w-16 h-16 rounded-2xl bg-emerald-50 dark:bg-carbon-800 text-emerald-600 dark:text-emerald-400 mx-auto flex items-center justify-center mb-4 border border-emerald-100 dark:border-carbon-700">
+                        <Clock className="w-8 h-8" />
+                    </div>
+                    <h3 className="text-lg sm:text-xl font-bold text-stone-900 dark:text-white tracking-tight">
+                        Belum Ada Riwayat Aktivitas
+                    </h3>
+                    <p className="max-w-md mx-auto text-xs sm:text-sm text-stone-600 dark:text-stone-400 mt-2 leading-relaxed">
+                        Anda belum memiliki catatan setoran limbah ke komunitas maupun dokumentasi olah mandiri Kon-Tiki.
+                    </p>
+                    <div className="mt-6">
+                        <button
+                            type="button"
+                            onClick={onSwitchToScanner}
+                            className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-semibold bg-emerald-600 hover:bg-emerald-500 text-white min-h-[44px] transition shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500"
+                        >
+                            <Camera className="w-4 h-4" />
+                            <span>Mulai Pemindaian Sekarang</span>
+                        </button>
+                    </div>
                 </div>
-            ) : (
+            )}
+
+            {/* Submissions Section */}
+            {showSubmissions && submissions.length > 0 && (
                 <div className="space-y-4">
-                    {filteredRecords.map((record) => {
-                        const isExpanded = expandedCardId === record.id;
-                        const isKomunitas = record.destination === 'komunitas';
+                    <h3 className="text-xs font-bold uppercase tracking-wider text-stone-500 dark:text-stone-400 px-1">
+                        Setoran Limbah ke Sentra Komunitas ({submissions.length})
+                    </h3>
+
+                    {submissions.map((sub) => {
+                        const currentStatus = sub.status || 'Menanti';
+                        const badgeCfg = getStatusBadge(currentStatus);
+                        const StatusIcon = badgeCfg.icon;
 
                         return (
                             <div
-                                key={record.id}
-                                className="p-5 sm:p-6 rounded-2xl bg-white dark:bg-carbon-850 border border-stone-200 dark:border-carbon-700/60 shadow-sm transition-all hover:border-stone-300 dark:hover:border-carbon-600"
+                                key={sub.id}
+                                className="p-5 sm:p-6 rounded-2xl bg-white dark:bg-carbon-850 border border-stone-200 dark:border-carbon-700/60 shadow-sm transition hover:border-emerald-500/40"
                             >
-                                {/* Card Header */}
-                                <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-3 pb-4 border-b border-stone-100 dark:border-carbon-700/60">
-                                    <div>
-                                        <div className="flex flex-wrap items-center gap-2 mb-1.5">
-                                            {/* Destination Badge */}
-                                            {isKomunitas ? (
-                                                <Badge variant="foliage" size="sm" dot>
-                                                    <Building2 className="w-3 h-3 mr-1 inline" />
-                                                    Setor ke Komunitas
-                                                </Badge>
-                                            ) : (
-                                                <Badge variant="harvest" size="sm" dot>
-                                                    <Flame className="w-3 h-3 mr-1 inline" />
-                                                    Olah Mandiri Kon-Tiki
-                                                </Badge>
-                                            )}
-
-                                            {/* Accuracy & Moisture */}
-                                            <Badge variant="carbon" size="sm">
-                                                {record.aiConfidence || 95}% Akurat
-                                            </Badge>
-                                            <Badge variant={record.isDryReady ? 'foliage' : 'terracotta'} size="sm">
-                                                {record.moistureCondition || 'Kering Siap Olah'}
-                                            </Badge>
-                                        </div>
-
-                                        <h4 className="text-base sm:text-lg font-bold text-stone-900 dark:text-white tracking-tight">
-                                            {record.detectedWasteType || record.commodity}
-                                        </h4>
-                                        <div className="flex items-center gap-3 text-xs text-stone-500 dark:text-stone-400 mt-1">
-                                            <span className="flex items-center gap-1">
-                                                <Calendar className="w-3.5 h-3.5" />
-                                                {record.dateFormatted || 'Baru saja'}
+                                <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-3 pb-4 border-b border-stone-100 dark:border-carbon-800">
+                                    <div className="space-y-1">
+                                        <div className="flex flex-wrap items-center gap-2 mb-1">
+                                            <span className="font-mono text-xs font-bold px-2.5 py-0.5 rounded-lg bg-stone-100 dark:bg-carbon-900 text-stone-800 dark:text-stone-200 border border-stone-200 dark:border-carbon-800">
+                                                {sub.tracking_code}
                                             </span>
-                                            {record.region && (
-                                                <span className="flex items-center gap-1">
-                                                    <MapPin className="w-3.5 h-3.5" />
-                                                    {record.region}
+                                            <span
+                                                className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-bold border ${badgeCfg.bg}`}
+                                            >
+                                                <StatusIcon className="w-3 h-3" />
+                                                <span>{currentStatus}</span>
+                                            </span>
+                                            {sub.verified_at && (
+                                                <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[11px] font-semibold bg-emerald-50 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800/60">
+                                                    <CheckCircle2 className="w-3 h-3 text-emerald-600 dark:text-emerald-400" />
+                                                    <span>Terverifikasi Sentra</span>
                                                 </span>
                                             )}
                                         </div>
-                                    </div>
 
-                                    <div className="flex items-center gap-2 self-end sm:self-auto">
-                                        <button
-                                            type="button"
-                                            onClick={() => handleDelete(record.id)}
-                                            className="w-10 h-10 min-h-[44px] min-w-[44px] rounded-xl flex items-center justify-center text-stone-400 hover:text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/40 border border-transparent hover:border-rose-200 dark:hover:border-rose-900 transition"
-                                            aria-label={`Hapus rekaman ${record.detectedWasteType}`}
-                                            title="Hapus rekaman ini"
-                                        >
-                                            <Trash2 className="w-4 h-4" />
-                                        </button>
+                                        <h4 className="text-base sm:text-lg font-bold text-stone-900 dark:text-white">
+                                            {sub.waste_type}
+                                        </h4>
+                                        <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-stone-500 dark:text-stone-400">
+                                            <span className="flex items-center gap-1">
+                                                <Calendar className="w-3.5 h-3.5" />
+                                                <span>{formatDate(sub.created_at)}</span>
+                                            </span>
+                                            <span>•</span>
+                                            <span>Bobot: <strong className="text-emerald-700 dark:text-emerald-400 font-mono">{sub.estimated_weight_kg || 0} kg</strong></span>
+                                        </div>
                                     </div>
                                 </div>
 
-                                {/* Community Hub Destination Information (if Komunitas) */}
-                                {isKomunitas && record.community && (
-                                    <div className="mt-4 p-4 rounded-xl bg-emerald-50/70 dark:bg-carbon-900 border border-emerald-200/80 dark:border-carbon-700/80 text-xs sm:text-sm">
-                                        <div className="font-bold text-emerald-900 dark:text-emerald-300 flex items-center gap-1.5 mb-1">
+                                {/* Community Target Card */}
+                                {sub.community && (
+                                    <div className="mt-4 p-4 rounded-xl bg-stone-50 dark:bg-carbon-900 border border-stone-200 dark:border-carbon-800 text-xs sm:text-sm">
+                                        <div className="font-bold text-stone-900 dark:text-white flex items-center gap-1.5 mb-1">
                                             <Building2 className="w-4 h-4 text-emerald-600 dark:text-emerald-400 shrink-0" />
-                                            <span>Sentra Tujuan: {record.community.name}</span>
+                                            <span>Sentra Tujuan: {sub.community.name}</span>
                                         </div>
-                                        <p className="text-stone-700 dark:text-stone-300 flex items-start gap-1.5 mt-1 leading-relaxed">
-                                            <MapPin className="w-3.5 h-3.5 text-stone-400 shrink-0 mt-0.5" />
-                                            <span>{record.community.address}</span>
-                                        </p>
-                                        {(record.community.contactPerson || record.community.phone) && (
-                                            <p className="text-stone-600 dark:text-stone-400 flex items-center gap-1.5 mt-1">
+                                        {sub.community.community_address && (
+                                            <p className="text-stone-600 dark:text-stone-300 flex items-start gap-1.5 mt-1 leading-relaxed">
+                                                <MapPin className="w-3.5 h-3.5 text-stone-400 shrink-0 mt-0.5" />
+                                                <span>{sub.community.community_address}</span>
+                                            </p>
+                                        )}
+                                        {sub.community.phone && (
+                                            <p className="text-stone-500 dark:text-stone-400 flex items-center gap-1.5 mt-1">
                                                 <Phone className="w-3.5 h-3.5 text-stone-400 shrink-0" />
-                                                <span>Kontak: {record.community.contactPerson} ({record.community.phone})</span>
+                                                <span>Kontak Sentra: {sub.community.phone}</span>
                                             </p>
                                         )}
                                     </div>
                                 )}
 
-                                {/* Nutrient Highlights */}
-                                {record.nutrientHighlights && (
-                                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 mt-4">
-                                        {Object.entries(record.nutrientHighlights).map(([k, v]) => (
-                                            <div
-                                                key={k}
-                                                className="p-3 rounded-xl bg-stone-50 dark:bg-carbon-900 border border-stone-200/60 dark:border-carbon-800"
-                                            >
-                                                <div className="text-[11px] font-medium text-stone-500 dark:text-stone-400 truncate">{k}</div>
-                                                <div className="text-xs sm:text-sm font-bold text-emerald-700 dark:text-emerald-400 mt-0.5">
-                                                    {v}
-                                                </div>
-                                            </div>
-                                        ))}
-                                    </div>
+                                {sub.notes && (
+                                    <p className="text-xs text-stone-600 dark:text-stone-400 italic mt-3 bg-stone-50 dark:bg-carbon-900/60 p-3 rounded-xl border border-stone-200/60 dark:border-carbon-800">
+                                        Catatan Anda: "{sub.notes}"
+                                    </p>
                                 )}
 
-                                {/* Summary Recommendation */}
-                                {record.summaryRecommendation && (
-                                    <div className="mt-4 p-3.5 rounded-xl bg-stone-50 dark:bg-carbon-900/60 border border-stone-200/60 dark:border-carbon-800 flex items-start gap-2.5">
+                                {/* Verification Result Display */}
+                                {sub.verification_notes && (
+                                    <div className="mt-3 p-3.5 rounded-xl bg-emerald-50 dark:bg-emerald-950/30 border border-emerald-200 dark:border-emerald-800 text-xs text-stone-700 dark:text-stone-300 space-y-2">
+                                        <div className="font-semibold text-emerald-800 dark:text-emerald-300 flex items-center gap-1.5">
+                                            <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400 shrink-0" />
+                                            <span>Hasil Pemeriksaan Sentra Komunitas:</span>
+                                        </div>
+                                        <p className="leading-relaxed">{sub.verification_notes}</p>
+                                        {sub.verification_photo_path && (
+                                            <div className="mt-2">
+                                                <img
+                                                    src={sub.verification_photo_path}
+                                                    alt="Foto verifikasi sentra"
+                                                    className="w-24 h-24 object-cover rounded-lg border border-emerald-300 dark:border-emerald-700"
+                                                />
+                                            </div>
+                                        )}
+                                    </div>
+                                )}
+                            </div>
+                        );
+                    })}
+                </div>
+            )}
+
+            {/* Mandiri Scans Section */}
+            {showMandiri && mandiriScans.length > 0 && (
+                <div className="space-y-4">
+                    <h3 className="text-xs font-bold uppercase tracking-wider text-stone-500 dark:text-stone-400 px-1">
+                        Dokumentasi Olah Mandiri Kon-Tiki ({mandiriScans.length})
+                    </h3>
+
+                    {mandiriScans.map((scan) => {
+                        const isExpanded = expandedScanId === scan.id;
+
+                        return (
+                            <div
+                                key={scan.id}
+                                className="p-5 sm:p-6 rounded-2xl bg-white dark:bg-carbon-850 border border-stone-200 dark:border-carbon-700/60 shadow-sm transition hover:border-amber-500/40"
+                            >
+                                <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-3 pb-4 border-b border-stone-100 dark:border-carbon-800">
+                                    <div className="space-y-1">
+                                        <div className="flex flex-wrap items-center gap-2 mb-1">
+                                            <Badge variant="harvest" size="sm" dot>
+                                                <Flame className="w-3 h-3 mr-1 inline" />
+                                                Olah Mandiri Kon-Tiki
+                                            </Badge>
+                                            <Badge variant="carbon" size="sm">
+                                                Akurasi {Math.round(scan.ai_confidence)}%
+                                            </Badge>
+                                            <Badge variant="foliage" size="sm">
+                                                {scan.moisture_condition}
+                                            </Badge>
+                                        </div>
+
+                                        <h4 className="text-base sm:text-lg font-bold text-stone-900 dark:text-white">
+                                            {scan.detected_waste_type}
+                                        </h4>
+                                        <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-stone-500 dark:text-stone-400">
+                                            <span className="flex items-center gap-1">
+                                                <Calendar className="w-3.5 h-3.5" />
+                                                <span>{formatDate(scan.created_at)}</span>
+                                            </span>
+                                            <span>•</span>
+                                            <span className="flex items-center gap-1">
+                                                <MapPin className="w-3.5 h-3.5" />
+                                                <span>{scan.village_location}, Kab. {scan.regency}</span>
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                {scan.ai_summary_recommendation && (
+                                    <div className="mt-3.5 p-3 rounded-xl bg-stone-50 dark:bg-carbon-900 border border-stone-200/80 dark:border-carbon-800 flex items-start gap-2.5">
                                         <Leaf className="w-4 h-4 text-emerald-600 dark:text-emerald-400 shrink-0 mt-0.5" />
                                         <p className="text-xs sm:text-sm text-stone-700 dark:text-stone-300 leading-relaxed">
-                                            {record.summaryRecommendation}
+                                            {scan.ai_summary_recommendation}
                                         </p>
                                     </div>
                                 )}
 
-                                {/* Carbon Potential Highlights */}
-                                {record.carbonPotential && (
-                                    <div className="mt-3 flex flex-wrap items-center gap-2 text-xs text-stone-600 dark:text-stone-400">
-                                        <span className="font-semibold text-stone-800 dark:text-stone-200">Potensi Karbon:</span>
-                                        <span className="px-2 py-0.5 rounded-md bg-stone-100 dark:bg-carbon-800 text-emerald-700 dark:text-emerald-400 font-medium">
-                                            {record.carbonPotential.co2Avoidance}
-                                        </span>
-                                        <span className="px-2 py-0.5 rounded-md bg-stone-100 dark:bg-carbon-800 text-stone-700 dark:text-stone-300 font-medium">
-                                            Fixed C: {record.carbonPotential.fixedCarbon}
-                                        </span>
-                                    </div>
-                                )}
-
-                                {/* Expandable 3-Step Kon-Tiki Guide Accordion */}
-                                {record.steps && record.steps.length > 0 && (
-                                    <div className="mt-4 pt-3 border-t border-stone-100 dark:border-carbon-700/60">
+                                {/* Expandable Steps */}
+                                {Array.isArray(scan.ai_next_steps) && scan.ai_next_steps.length > 0 && (
+                                    <div className="mt-4 pt-3 border-t border-stone-100 dark:border-carbon-800">
                                         <button
                                             type="button"
-                                            onClick={() => setExpandedCardId(isExpanded ? null : record.id)}
-                                            className="w-full flex items-center justify-between py-2 text-xs sm:text-sm font-semibold text-stone-700 dark:text-stone-300 hover:text-emerald-600 dark:hover:text-emerald-400 min-h-[44px] transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 rounded-lg"
+                                            onClick={() => setExpandedScanId(isExpanded ? null : scan.id)}
+                                            className="w-full flex items-center justify-between py-1 text-xs font-semibold text-stone-700 dark:text-stone-300 hover:text-emerald-600 dark:hover:text-emerald-400 min-h-[44px] transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 rounded-lg"
                                             aria-expanded={isExpanded}
                                         >
                                             <span className="flex items-center gap-2">
                                                 <Layers className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
-                                                <span>{isExpanded ? 'Tutup 3 Langkah Panduan' : 'Lihat 3 Langkah Panduan Terjadwal'}</span>
+                                                <span>{isExpanded ? 'Tutup Rincian Tahapan' : 'Lihat Rekomendasi Tahap Pirolisis'}</span>
                                             </span>
                                             {isExpanded ? (
                                                 <ChevronUp className="w-4 h-4" />
@@ -351,36 +374,19 @@ export default function ScanHistory({ onSwitchToScanner }) {
                                         </button>
 
                                         {isExpanded && (
-                                            <div className="space-y-3 pt-2">
-                                                {record.steps.map((st, idx) => (
-                                                    <div
+                                            <ol className="space-y-2 pt-2">
+                                                {scan.ai_next_steps.map((st, idx) => (
+                                                    <li
                                                         key={idx}
-                                                        className="p-3.5 rounded-xl bg-stone-50 dark:bg-carbon-900 border border-stone-200/60 dark:border-carbon-800 text-xs sm:text-sm"
+                                                        className="p-3 rounded-xl bg-stone-50 dark:bg-carbon-900 border border-stone-200 dark:border-carbon-800 text-xs text-stone-700 dark:text-stone-300 flex items-start gap-2.5"
                                                     >
-                                                        <div className="flex items-center justify-between gap-2 mb-1">
-                                                            <div className="font-bold text-stone-900 dark:text-white flex items-center gap-2">
-                                                                <span className="w-5 h-5 rounded-full bg-emerald-600 text-white text-xs flex items-center justify-center font-bold">
-                                                                    {idx + 1}
-                                                                </span>
-                                                                <span>{st.title}</span>
-                                                            </div>
-                                                            {st.badge && (
-                                                                <span className="text-[11px] px-2 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-950 text-emerald-800 dark:text-emerald-300 font-medium">
-                                                                    {st.badge}
-                                                                </span>
-                                                            )}
-                                                        </div>
-                                                        <p className="text-stone-600 dark:text-stone-300 ml-7 leading-relaxed">
-                                                            {st.instructions}
-                                                        </p>
-                                                        {st.parameter && (
-                                                            <div className="ml-7 mt-1.5 text-[11px] text-stone-500 dark:text-stone-400 font-mono">
-                                                                Parameter: {st.parameter}
-                                                            </div>
-                                                        )}
-                                                    </div>
+                                                        <span className="w-5 h-5 rounded-full bg-emerald-600 text-white text-xs flex items-center justify-center font-bold shrink-0">
+                                                            {idx + 1}
+                                                        </span>
+                                                        <span className="leading-relaxed">{st}</span>
+                                                    </li>
                                                 ))}
-                                            </div>
+                                            </ol>
                                         )}
                                     </div>
                                 )}

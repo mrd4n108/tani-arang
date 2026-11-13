@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Models\User;
 use App\Models\WasteScan;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
@@ -18,6 +19,8 @@ class WasteScanIntegrationTest extends TestCase
 
     public function test_user_can_store_scan_log_and_redirect_to_community_map(): void
     {
+        $user = User::factory()->create(['role' => 'petani']);
+
         $payload = [
             'farmer_group_name' => 'Poktan Tani Subur Lamongan',
             'village_location' => 'Desa Karanggeneng',
@@ -35,7 +38,7 @@ class WasteScanIntegrationTest extends TestCase
             ],
         ];
 
-        $response = $this->post('/scanner/store', $payload);
+        $response = $this->actingAs($user)->post('/scanner/store', $payload);
 
         $response->assertRedirect('/community-map');
         $this->assertDatabaseHas('waste_scans', [
@@ -46,7 +49,9 @@ class WasteScanIntegrationTest extends TestCase
 
     public function test_store_scan_validates_coordinates_and_required_fields(): void
     {
-        $response = $this->post('/scanner/store', [
+        $user = User::factory()->create(['role' => 'petani']);
+
+        $response = $this->actingAs($user)->post('/scanner/store', [
             'farmer_group_name' => '',
             'latitude' => 195.0,
         ]);

@@ -3,11 +3,11 @@ import { Link } from '@inertiajs/react';
 import { Flame } from 'lucide-react';
 import ThemeToggle from '@/Components/ThemeToggle';
 
-export default function GuestLayout({ children }) {
+export default function GuestLayout({ children, maxWidth = 'max-w-md' }) {
     return (
         <div className="min-h-screen flex flex-col items-center justify-center bg-stone-50 dark:bg-carbon-900 text-stone-900 dark:text-stone-100 px-4 py-8 selection:bg-emerald-600/30 selection:text-emerald-300 transition-colors">
             {/* Top Bar with Brand & Theme Toggle */}
-            <div className="w-full max-w-md flex items-center justify-between mb-6">
+            <div className={`w-full ${maxWidth} flex items-center justify-between mb-6`}>
                 <Link
                     href="/"
                     className="flex items-center gap-3 group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 rounded-xl"
@@ -30,7 +30,7 @@ export default function GuestLayout({ children }) {
             </div>
 
             {/* Auth Card */}
-            <div className="w-full max-w-md overflow-hidden bg-white dark:bg-carbon-850 border border-stone-200 dark:border-carbon-700/60 p-6 sm:p-8 shadow-sm rounded-2xl transition-colors">
+            <div className={`w-full ${maxWidth} overflow-hidden bg-white dark:bg-carbon-850 border border-stone-200 dark:border-carbon-700/60 p-6 sm:p-8 shadow-sm rounded-2xl transition-colors`}>
                 {children}
             </div>
         </div>

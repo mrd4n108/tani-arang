@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\TaniArangController;
 use Illuminate\Support\Facades\Route;
 
@@ -17,3 +18,22 @@ Route::post('/community-map/scans/{id}/restore', [TaniArangController::class, 'r
 
 Route::get('/contact', [TaniArangController::class, 'contact'])->name('contact');
 Route::post('/contact', [TaniArangController::class, 'storeContact'])->name('contact.store');
+
+// Rute Terproteksi Role Petani
+Route::middleware(['auth', 'role:petani'])->group(function () {
+    Route::get('/petani/history', [TaniArangController::class, 'petaniHistory'])->name('petani.history');
+});
+
+// Rute Terproteksi Role Komunitas
+Route::middleware(['auth', 'role:komunitas'])->group(function () {
+    Route::patch('/community-map/submissions/{id}/status', [TaniArangController::class, 'updateSubmissionStatus'])->name('submissions.update-status');
+    Route::post('/community-map/submissions/{id}/verify', [TaniArangController::class, 'verifySubmission'])->name('submissions.verify');
+});
+
+Route::middleware('auth')->group(function () {
+    Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
+    Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
+    Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+});
+
+require __DIR__.'/auth.php';
