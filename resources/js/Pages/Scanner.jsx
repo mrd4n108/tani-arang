@@ -86,6 +86,7 @@ export default function Scanner({
     });
 
     const [isScanning, setIsScanning] = useState(false);
+    const [scanError, setScanError] = useState('');
     const [activePresetKey, setActivePresetKey] = useState('jerami_lamongan');
     const [previewUrl, setPreviewUrl] = useState(null);
     const [analysisResult, setAnalysisResult] = useState(
@@ -247,10 +248,16 @@ export default function Scanner({
     };
 
     const compressImageToWebP = (file) => {
-        return new Promise((resolve) => {
+        return new Promise((resolve, reject) => {
             const reader = new FileReader();
+            reader.onerror = () => {
+                reject(new Error('Gagal membaca berkas gambar. Silakan pilih foto lain.'));
+            };
             reader.onload = (event) => {
                 const img = new Image();
+                img.onerror = () => {
+                    reject(new Error('Format foto tidak didukung oleh browser. Gunakan format JPG, PNG, atau WebP.'));
+                };
                 img.onload = () => {
                     const canvas = document.createElement('canvas');
                     const maxDim = 768;
@@ -267,7 +274,15 @@ export default function Scanner({
                     canvas.height = height;
                     const ctx = canvas.getContext('2d');
                     ctx.drawImage(img, 0, 0, width, height);
-                    resolve(canvas.toDataURL('image/webp', 0.72));
+                    let dataUrl = canvas.toDataURL('image/webp', 0.72);
+                    if (
+                        typeof dataUrl !== 'string' ||
+                        !dataUrl.startsWith('data:image/') ||
+                        dataUrl.length <= 100
+                    ) {
+                        dataUrl = canvas.toDataURL('image/jpeg', 0.75);
+                    }
+                    resolve(dataUrl);
                 };
                 img.src = event.target.result;
             };
@@ -275,23 +290,173 @@ export default function Scanner({
         });
     };
 
+    const getCsrfHeaders = () => {
+        const headers = {
+            'Content-Type': 'application/json',
+            'X-Requested-With': 'XMLHttpRequest',
+            Accept: 'application/json',
+        };
+        if (typeof document !== 'undefined') {
+            const metaToken = document
+                .querySelector('meta[name="csrf-token"]')
+                ?.getAttribute('content');
+            if (metaToken) {
+                headers['X-CSRF-TOKEN'] = metaToken;
+            }
+            const xsrfMatch = document.cookie.match(/(?:^|;\s*)XSRF-TOKEN=([^;]+)/);
+            if (xsrfMatch && xsrfMatch[1]) {
+                headers['X-XSRF-TOKEN'] = decodeURIComponent(xsrfMatch[1]);
+            }
+        }
+        return headers;
+    };
+
     const handleFileUpload = async (e) => {
         const file = e.target.files?.[0];
+        e.target.value = '';
         if (!file) return;
+
         setIsScanning(true);
+        setScanError('');
         setActivePresetKey('');
-        const compressedBase64 = await compressImageToWebP(file);
-        setPreviewUrl(compressedBase64);
+
         try {
-            const res = await axios.post('/scanner/analyze', {
-                image_base64: compressedBase64,
-            });
-            const data = res.data.analysis;
-            setAnalysisResult(data);
-        } catch {
-            if (presets['jerami_lamongan']) {
-                setAnalysisResult(presets['jerami_lamongan']);
+            const compressedBase64 = await compressImageToWebP(file);
+
+            if (
+                typeof compressedBase64 !== 'string' ||
+                !compressedBase64.startsWith('data:image/') ||
+                compressedBase64.length <= 100
+            ) {
+                throw new Error(
+                    'Data gambar hasil kompresi tidak valid atau kosong. Silakan pilih berkas foto lain.'
+                );
             }
+
+            setPreviewUrl(compressedBase64);
+
+            const formData = new FormData();
+            formData.append('image_base64', compressedBase64);
+
+            try {
+                const [mimePart, b64Data] = compressedBase64.split(',');
+                if (b64Data) {
+                    const mimeMatch = mimePart.match(/data:([^;]+);base64/);
+                    const mimeType = mimeMatch ? mimeMatch[1] : 'image/webp';
+                    const byteCharacters = atob(b64Data);
+                    const byteNumbers = new Uint8Array(byteCharacters.length);
+                    for (let i = 0; i < byteCharacters.length; i++) {
+                        byteNumbers[i] = byteCharacters.charCodeAt(i);
+                    }
+                    const imageBlob = new Blob([byteNumbers], { type: mimeType });
+                    const ext = mimeType === 'image/jpeg' ? 'jpg' : 'webp';
+                    formData.append('image', imageBlob, `scan.${ext}`);
+                }
+            } catch {}
+
+            const csrfToken =
+                typeof document !== 'undefined'
+                    ? document
+                          .querySelector('meta[name="csrf-token"]')
+                          ?.getAttribute('content')
+                    : null;
+            const xsrfMatch =
+                typeof document !== 'undefined'
+                    ? document.cookie.match(/(?:^|;\s*)XSRF-TOKEN=([^;]+)/)
+                    : null;
+
+            const headers = {
+                Accept: 'application/json',
+                'X-Requested-With': 'XMLHttpRequest',
+                ...(csrfToken ? { 'X-CSRF-TOKEN': csrfToken } : {}),
+                ...(xsrfMatch && xsrfMatch[1]
+                    ? { 'X-XSRF-TOKEN': decodeURIComponent(xsrfMatch[1]) }
+                    : {}),
+            };
+
+            console.log('Mengirim payload panjang:', compressedBase64.length);
+
+            const res = await fetch('/scanner/analyze', {
+                method: 'POST',
+                headers,
+                body: formData,
+                credentials: 'same-origin',
+            });
+
+            const rawText = await res.text();
+            let responsePayload = null;
+            if (rawText) {
+                try {
+                    responsePayload = JSON.parse(rawText);
+                } catch {
+                    const jsonStart = rawText.indexOf('{');
+                    const jsonEnd = rawText.lastIndexOf('}');
+                    if (jsonStart !== -1 && jsonEnd > jsonStart) {
+                        try {
+                            responsePayload = JSON.parse(
+                                rawText.slice(jsonStart, jsonEnd + 1)
+                            );
+                        } catch {}
+                    }
+                }
+            }
+
+            if (!res.ok) {
+                const err = new Error(
+                    responsePayload?.message ||
+                        `Gagal memproses foto (HTTP ${res.status}).`
+                );
+                err.response = {
+                    status: res.status,
+                    data: responsePayload,
+                };
+                throw err;
+            }
+
+            const data = responsePayload?.analysis;
+            if (data && typeof data === 'object') {
+                if (data.is_fallback === true) {
+                    setScanError(
+                        data.fallback_reason ||
+                            'Layanan AI gagal memproses foto secara langsung. Silakan coba lagi.'
+                    );
+                } else if (data.detected_waste_type) {
+                    setAnalysisResult(data);
+                    if (
+                        data.recommended_regency &&
+                        REGENCY_COORDS[data.recommended_regency]
+                    ) {
+                        setRegency(data.recommended_regency);
+                        setCommunityRegencyFilter(data.recommended_regency);
+                        setHasCustomCoords(false);
+                        setCoords(REGENCY_COORDS[data.recommended_regency]);
+                    }
+                } else {
+                    setScanError(
+                        `Respons analisis AI belum lengkap (HTTP ${res?.status ?? 200}).`
+                    );
+                }
+            } else {
+                setScanError(
+                    `Respons analisis AI belum lengkap (HTTP ${res?.status ?? 200}).`
+                );
+            }
+        } catch (error) {
+            const status = error?.response?.status;
+            const serverMessage = error?.response?.data?.message;
+            let msg =
+                'Gagal menganalisis foto secara langsung. Pastikan koneksi internet stabil dan format foto JPG, PNG, atau WebP.';
+
+            if (status) {
+                msg = `Gagal memproses foto (HTTP ${status}${
+                    serverMessage ? `: ${serverMessage}` : ''
+                }).`;
+            } else if (error?.message) {
+                msg = error.message;
+            }
+
+            setScanError(msg);
+            setAnalysisResult((prev) => prev || presets['jerami_lamongan'] || null);
         } finally {
             setIsScanning(false);
         }
@@ -299,17 +464,27 @@ export default function Scanner({
 
     const triggerInstantPreset = async (presetKey) => {
         setIsScanning(true);
+        setScanError('');
         setActivePresetKey(presetKey);
         setPreviewUrl(null);
         try {
-            const res = await axios.post('/scanner/analyze', { preset_key: presetKey });
-            const data = res.data.analysis;
-            setAnalysisResult(data);
-            if (data.recommended_regency && REGENCY_COORDS[data.recommended_regency]) {
-                setRegency(data.recommended_regency);
-                setCommunityRegencyFilter(data.recommended_regency);
-                setHasCustomCoords(false);
-                setCoords(REGENCY_COORDS[data.recommended_regency]);
+            const res = await axios.post(
+                '/scanner/analyze',
+                { preset_key: presetKey },
+                {
+                    headers: getCsrfHeaders(),
+                    withCredentials: true,
+                }
+            );
+            const data = res?.data?.analysis;
+            if (data && typeof data === 'object' && data.detected_waste_type) {
+                setAnalysisResult(data);
+                if (data.recommended_regency && REGENCY_COORDS[data.recommended_regency]) {
+                    setRegency(data.recommended_regency);
+                    setCommunityRegencyFilter(data.recommended_regency);
+                    setHasCustomCoords(false);
+                    setCoords(REGENCY_COORDS[data.recommended_regency]);
+                }
             }
         } catch {
             const fallback = presets[presetKey];
@@ -481,17 +656,69 @@ export default function Scanner({
                                 <span>1. Unggah Foto atau Gunakan Sampel Uji Coba</span>
                             </h3>
 
-                            <label className="min-h-[44px] inline-flex items-center justify-center gap-2 px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold cursor-pointer shadow-sm transition focus-within:ring-2 focus-within:ring-emerald-400">
+                            <label
+                                className={`min-h-[44px] inline-flex items-center justify-center gap-2 px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold cursor-pointer shadow-sm transition focus-within:ring-2 focus-within:ring-emerald-400 ${
+                                    isScanning ? 'opacity-70 pointer-events-none' : ''
+                                }`}
+                            >
                                 <UploadCloud className="w-4 h-4" />
-                                <span>Pilih Berkas Foto Residu</span>
+                                <span>{isScanning ? 'Memproses Foto...' : 'Pilih Berkas Foto Residu'}</span>
                                 <input
                                     type="file"
                                     accept="image/*"
+                                    disabled={isScanning}
                                     onChange={handleFileUpload}
                                     className="sr-only"
                                 />
                             </label>
                         </div>
+
+                        {/* Preview Gambar Langsung di Panel Unggah Utama */}
+                        {previewUrl && (
+                            <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 p-3.5 rounded-xl bg-stone-50 dark:bg-carbon-900 border border-stone-200 dark:border-carbon-800">
+                                <div className="w-full sm:w-32 h-32 rounded-xl overflow-hidden border border-stone-200 dark:border-carbon-700 shrink-0 bg-stone-100 dark:bg-carbon-950">
+                                    <img
+                                        src={previewUrl}
+                                        alt="Pratinjau foto limbah yang diunggah"
+                                        className="w-full h-full object-cover"
+                                    />
+                                </div>
+                                <div className="space-y-1">
+                                    <span className="inline-flex items-center gap-1.5 text-xs font-bold text-emerald-700 dark:text-emerald-400">
+                                        <CheckCircle2 className="w-3.5 h-3.5" />
+                                        <span>Foto Residu Siap Dianalisis</span>
+                                    </span>
+                                    <p className="text-xs text-stone-600 dark:text-stone-400 leading-relaxed">
+                                        Foto otomatis dikompresi ke format WebP (maks. 768px) agar hemat kuota dan cepat diproses oleh AI Vision.
+                                    </p>
+                                </div>
+                            </div>
+                        )}
+
+                        {/* Indikator Loading Saat Kompresi & Pemindaian AI */}
+                        {isScanning && (
+                            <div
+                                role="status"
+                                aria-live="polite"
+                                className="flex items-center gap-3 p-4 rounded-xl bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800/60 text-emerald-900 dark:text-emerald-200"
+                            >
+                                <div className="w-5 h-5 rounded-full border-2 border-emerald-600 dark:border-emerald-400 border-t-transparent animate-spin shrink-0" />
+                                <span className="text-xs sm:text-sm font-semibold">
+                                    AI sedang menganalisis foto limbah...
+                                </span>
+                            </div>
+                        )}
+
+                        {/* Pesan Peringatan Ramah Jika Terjadi Kendala */}
+                        {scanError && !isScanning && (
+                            <div
+                                role="alert"
+                                className="flex items-start gap-2.5 p-3.5 rounded-xl bg-amber-50 dark:bg-amber-950/40 border border-amber-300 dark:border-amber-800/60 text-amber-900 dark:text-amber-200 text-xs leading-relaxed"
+                            >
+                                <AlertCircle className="w-4 h-4 text-amber-600 dark:text-amber-400 shrink-0 mt-0.5" />
+                                <span>{scanError}</span>
+                            </div>
+                        )}
 
                         {/* Preset Buttons */}
                         <div>

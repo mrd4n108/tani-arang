@@ -15,12 +15,36 @@ class WasteVisionService
             return $presets[$presetKey];
         }
 
+        if (empty($payload) && app()->bound('request')) {
+            $req = request();
+            $payload = $req->input('image_base64')
+                ?? $req->json('image_base64')
+                ?? $req->input('payload')
+                ?? $req->input('image')
+                ?? null;
+
+            if (empty($payload)) {
+                $rawContent = $req->getContent();
+                if (! empty($rawContent)) {
+                    $rawDecoded = json_decode($rawContent, true);
+                    if (is_array($rawDecoded) && ! empty($rawDecoded['image_base64'])) {
+                        $payload = $rawDecoded['image_base64'];
+                    }
+                }
+            }
+        }
+
         if (empty($payload)) {
-            return $this->getFallbackData();
+            Log::warning('WasteVisionService dipanggil dengan payload gambar kosong.');
+            return $this->getFallbackData('Payload gambar kosong atau tidak terkirim ke server.');
         }
 
         $apiKey = config('services.gemini.key');
-        $primaryModel = config('services.gemini.model', 'gemini-2.5-flash');
+
+        if (empty($apiKey)) {
+            Log::warning('GEMINI_API_KEY kosong atau belum terbaca dari config.');
+            return $this->getFallbackData('GEMINI_API_KEY kosong atau belum terbaca dari konfigurasi server.');
+        }
 
         // Memisahkan metadata base64 jika ada (contoh: data:image/jpeg;base64,...)
         if (str_contains($payload, ',')) {
@@ -35,7 +59,7 @@ class WasteVisionService
 
         if (empty($base64Data)) {
             Log::warning('Gemini Vision fallback triggered: Data gambar base64 tidak valid atau kosong.');
-            return $this->getFallbackData();
+            return $this->getFallbackData('Data gambar base64 tidak valid atau kosong.');
         }
 
         $prompt = "Analisis foto limbah pertanian ini. Berperanlah sebagai Ahli Biochar & Agronomi Pertanian Indonesia untuk aplikasi TaniArang (fokus pada Jerami Padi, Sekam Padi, Tongkol Jagung, Kulit Buah Kakao, atau biomassa pertanian lainnya). " .
@@ -47,69 +71,91 @@ class WasteVisionService
             "ai_summary_recommendation (string: fakta manfaat spesifik arang/biochar dari limbah tersebut bagi tanah), " .
             "ai_Next_steps (array berisi tepat 3 string langkah praktis membuat arang metode lubang tanah Kon-Tiki atau drum tertutup minim asap).";
 
-        if (! empty($apiKey)) {
-            // Estafet model LIVE: jika model utama sibuk (503/429), langsung coba model aktif berikutnya
-            $modelsToTry = array_values(array_unique([
-                $primaryModel,
-                'gemini-2.5-flash',
-                'gemini-1.5-flash',
-                'gemini-1.5-flash-8b',
-                'gemini-2.0-flash',
-            ]));
+        // Estafet model Gemini 3 aktif: jika model utama sibuk (503/429), langsung coba model aktif berikutnya
+        $modelsToTry = array_values(array_unique([
+            config('services.gemini.model', 'gemini-3.5-flash-lite'),
+            'gemini-3.5-flash-lite',
+            'gemini-3.1-flash-lite',
+            'gemini-3.7-flash',
+            'gemini-3.8-flash',
+        ]));
 
-            foreach ($modelsToTry as $currentModel) {
-                try {
-                    $response = Http::withOptions([
-                        'verify' => false,
-                        'force_ip_resolve' => 'v4',
-                        'version' => 1.1,
-                    ])
-                        ->timeout(15)
-                        ->post("https://generativelanguage.googleapis.com/v1beta/models/{$currentModel}:generateContent?key={$apiKey}", [
-                            'contents' => [
-                                [
-                                    'parts' => [
-                                        ['text' => $prompt],
-                                        [
-                                            'inline_data' => [
-                                                'mime_type' => $mimeType,
-                                                'data' => $base64Data,
-                                            ],
+        $lastFailureReason = 'Seluruh model Gemini sedang sibuk atau gagal merespons.';
+
+        foreach ($modelsToTry as $currentModel) {
+            try {
+                $response = Http::withOptions([
+                    'verify' => false,
+                    'force_ip_resolve' => 'v4',
+                    'version' => 1.1,
+                ])
+                    ->timeout(30)
+                    ->post("https://generativelanguage.googleapis.com/v1beta/models/{$currentModel}:generateContent?key={$apiKey}", [
+                        'contents' => [
+                            [
+                                'parts' => [
+                                    ['text' => $prompt],
+                                    [
+                                        'inline_data' => [
+                                            'mime_type' => $mimeType,
+                                            'data' => $base64Data,
                                         ],
                                     ],
                                 ],
                             ],
-                            'generationConfig' => [
-                                'responseMimeType' => 'application/json',
-                            ],
-                        ]);
+                        ],
+                        'generationConfig' => [
+                            'responseMimeType' => 'application/json',
+                        ],
+                    ]);
 
-                    if ($response->successful()) {
-                        $result = $response->json();
-                        $jsonText = $result['candidates'][0]['content']['parts'][0]['text'] ?? '{}';
-                        $decoded = json_decode($jsonText, true);
-
-                        if (is_array($decoded) && isset($decoded['detected_waste_type'])) {
-                            $steps = $decoded['ai_Next_steps'] ?? $decoded['ai_next_steps'] ?? [];
-                            $decoded['ai_Next_steps'] = $steps;
-                            $decoded['ai_next_steps'] = $steps;
-                            $decoded['model_used'] = $currentModel;
-
-                            return $decoded;
+                if ($response->successful()) {
+                    $result = $response->json();
+                    $parts = $result['candidates'][0]['content']['parts'] ?? [];
+                    $jsonText = $parts[0]['text'] ?? '{}';
+                    foreach ($parts as $part) {
+                        if (empty($part['thought']) && isset($part['text'])) {
+                            $jsonText = $part['text'];
                         }
                     }
 
+                    $cleanJson = preg_replace('/^```json\s*|\s*```$/i', '', trim((string) $jsonText));
+                    $decoded = json_decode($cleanJson, true);
+
+                    if (is_array($decoded) && !empty(trim((string) ($decoded['detected_waste_type'] ?? '')))) {
+                        $steps = $decoded['ai_Next_steps'] ?? $decoded['ai_next_steps'] ?? [];
+                        $steps = is_array($steps) ? array_values($steps) : [];
+
+                        return [
+                            'is_fallback' => false,
+                            'fallback_reason' => null,
+                            'is_valid_waste' => (bool) ($decoded['is_valid_waste'] ?? true),
+                            'detected_waste_type' => trim((string) $decoded['detected_waste_type']),
+                            'moisture_condition' => (string) ($decoded['moisture_condition'] ?? 'Kering Siap Olah'),
+                            'ai_confidence' => max(0, min(100, (int) round((float) ($decoded['ai_confidence'] ?? 95)))),
+                            'ai_summary_recommendation' => (string) ($decoded['ai_summary_recommendation'] ?? ''),
+                            'ai_Next_steps' => $steps,
+                            'ai_next_steps' => $steps,
+                            'model_used' => $currentModel,
+                        ];
+                    }
+
+                    $lastFailureReason = "Model {$currentModel} mengembalikan respons JSON tanpa nama limbah.";
+                    Log::warning('Gemini mengembalikan detected_waste_type kosong: ' . $cleanJson);
+                } else {
+                    $lastFailureReason = "Model {$currentModel} gagal merespons (HTTP {$response->status()}).";
                     Log::warning("Model {$currentModel} sedang padat/gagal (HTTP {$response->status()}), beralih ke model berikutnya...");
-                } catch (\Throwable $e) {
-                    Log::warning("Koneksi ke {$currentModel} terganggu: " . $e->getMessage());
                 }
+            } catch (\Throwable $e) {
+                $lastFailureReason = "Koneksi ke model {$currentModel} terputus: " . $e->getMessage();
+                Log::warning("Koneksi ke {$currentModel} terganggu: " . $e->getMessage());
             }
         }
 
-        return $this->getFallbackData();
+        return $this->getFallbackData($lastFailureReason);
     }
 
-    public function getFallbackData(): array
+    public function getFallbackData(?string $reason = null): array
     {
         $steps = [
             "Kumpulkan jerami kering di dekat saluran air dan pastikan bebas dari sampah plastik.",
@@ -118,6 +164,8 @@ class WasteVisionService
         ];
 
         return [
+            "is_fallback" => true,
+            "fallback_reason" => $reason ?? "Layanan AI sedang sibuk, menampilkan data cadangan.",
             "is_valid_waste" => true,
             "detected_waste_type" => "Jerami Padi (Oryza sativa)",
             "moisture_condition" => "Kering Siap Olah",
@@ -125,6 +173,7 @@ class WasteVisionService
             "ai_summary_recommendation" => "Tumpukan jerami padi terdeteksi memiliki serat kering keemasan (<16% kadar air) dan siap dipirolisis. Mengolahnya menjadi biochar mencegah emisi 1.460 kg CO2/ton sekaligus meningkatkan daya ikat pupuk tanah sawah hingga 38%.",
             "ai_Next_steps" => $steps,
             "ai_next_steps" => $steps,
+            "model_used" => "fallback",
         ];
     }
 
