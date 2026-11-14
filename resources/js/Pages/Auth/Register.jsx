@@ -36,7 +36,7 @@ export default function Register() {
             }
         } catch (err) {}
 
-        post(route('register'), {
+        post('/register', {
             onFinish: () => reset('password', 'password_confirmation'),
         });
     };
@@ -217,7 +217,7 @@ export default function Register() {
                 {/* Footer Controls */}
                 <div className="pt-2 flex flex-col sm:flex-row items-center justify-between gap-3">
                     <Link
-                        href={route('login')}
+                        href="/login"
                         className="text-xs sm:text-sm text-stone-600 dark:text-stone-400 hover:text-emerald-600 dark:hover:text-emerald-400 underline transition"
                     >
                         Sudah punya akun? Masuk

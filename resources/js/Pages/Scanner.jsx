@@ -461,7 +461,7 @@ export default function Scanner({
                                     </p>
                                     <div className="pt-2">
                                         <Link
-                                            href={route('login')}
+                                            href="/login"
                                             className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-amber-600 hover:bg-amber-500 text-white text-xs font-semibold shadow-sm transition min-h-[44px]"
                                         >
                                             <LogIn className="w-3.5 h-3.5" />

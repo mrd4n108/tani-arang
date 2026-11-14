@@ -234,7 +234,7 @@ export default function AppLayout({ children, title }) {
                                             <div className="border-t border-stone-100 dark:border-carbon-700/60 my-1" />
 
                                             <Link
-                                                href={route('logout')}
+                                                href="/logout"
                                                 method="post"
                                                 as="button"
                                                 className="w-full flex items-center gap-2 px-3 py-2 text-xs font-medium text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/40 rounded-xl transition text-left min-h-[44px]"

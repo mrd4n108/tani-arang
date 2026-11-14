@@ -25,7 +25,7 @@ export default function Login({ status, canResetPassword }) {
         } catch (e) {}
 
         router.post(
-            route('login'),
+            '/login',
             {
                 email,
                 password,
@@ -55,7 +55,7 @@ export default function Login({ status, canResetPassword }) {
             localStorage.removeItem('taniarang_community_address');
         } catch (err) {}
 
-        post(route('login'), {
+        post('/login', {
             onFinish: () => reset('password'),
         });
     };
@@ -199,7 +199,7 @@ export default function Login({ status, canResetPassword }) {
 
                     {canResetPassword && (
                         <Link
-                            href={route('password.request')}
+                            href="/forgot-password"
                             className="text-xs text-stone-600 dark:text-stone-400 hover:text-emerald-600 dark:hover:text-emerald-400 underline transition min-h-[44px] inline-flex items-center"
                         >
                             Lupa sandi?
@@ -210,7 +210,7 @@ export default function Login({ status, canResetPassword }) {
                 {/* Actions */}
                 <div className="pt-2 flex flex-col sm:flex-row items-center justify-between gap-3">
                     <Link
-                        href={route('register')}
+                        href="/register"
                         className="text-xs sm:text-sm text-stone-600 dark:text-stone-400 hover:text-emerald-600 dark:hover:text-emerald-400 underline transition min-h-[44px] inline-flex items-center"
                     >
                         Belum punya akun? Buat akun baru
